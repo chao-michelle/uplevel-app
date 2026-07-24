@@ -1,0 +1,8 @@
+/* Shared styles for generated attendee pages. Placeholder — fill in once page design is set. */
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0 auto;
+  max-width: 640px;
+  padding: 2rem;
+}

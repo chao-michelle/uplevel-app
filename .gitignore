@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Raw and cleaned survey data contains attendee PII — keep it out of the repo.
+data/*
+!data/.gitkeep
+
+# Claude Code local settings
+.claude/settings.local.json
