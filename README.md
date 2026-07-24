@@ -62,11 +62,25 @@ rebuilds from it automatically on every push.
 
 ## Data privacy note
 
-GitHub Pages sites on free-tier repos are public if the repo is public,
-regardless of how obscure the per-attendee URLs are. Before generating and
-deploying real attendee pages, decide how this event's guest list and any
-personal survey data should be handled — e.g. keeping the repo private
-(GitHub Pro/Team/Enterprise support private-repo Pages), using unguessable
-per-attendee slugs, and/or adding `noindex` meta tags to keep pages out of
-search engines. `/data` is gitignored by default so raw and cleaned survey
-exports are never committed.
+This repo and its Pages site are **public** (private-repo Pages needs a
+paid GitHub plan, which this project isn't using). Attendee privacy relies
+on obscurity + de-indexing, not access control:
+
+- **Unguessable per-attendee slugs** — `scripts/generate.py` should generate
+  page filenames/URLs from a random token (e.g. `secrets.token_urlsafe`),
+  not from a name, email, or any sequential/predictable id.
+- **`site/robots.txt`** already disallows all crawling (`Disallow: /`) so
+  well-behaved search engines won't index pages.
+- **`noindex` meta tag** — each generated page should still include
+  `<meta name="robots" content="noindex">` in its `<head>`, since
+  `robots.txt` only stops crawling, not indexing of a URL discovered
+  elsewhere (e.g. linked from an email).
+- **`/data` is gitignored** so raw and cleaned survey exports (names,
+  emails, responses) are never committed to the public repo.
+
+None of this makes pages truly private — anyone with a page's URL can view
+it. And note that generated pages in `/site` **are** committed (Pages
+serves them from the repo), so attendee content that ends up on a page is
+in public git history too, including past versions after edits/deletes.
+Keep raw source data out of git entirely (`/data` is gitignored) and treat
+anything written into `/site` as public and permanent.
