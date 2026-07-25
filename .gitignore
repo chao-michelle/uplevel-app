@@ -10,6 +10,11 @@ venv/
 # Raw and cleaned survey data contains attendee PII — keep it out of the repo.
 data/*
 !data/.gitkeep
+!data/demo-attendees.json
+
+# Demo preview site is generated output — regenerate via the pipeline, never committed,
+# and not deployed (only /site is wired into the Pages workflow).
+/site-demo/
 
 # Claude Code local settings
 .claude/settings.local.json

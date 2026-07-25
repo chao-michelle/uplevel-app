@@ -7,40 +7,104 @@ matches with other attendees), published as a static site via GitHub Pages.
 ## Project structure
 
 ```
-/data                 raw and cleaned survey exports — gitignored, not committed
-/scripts              python scripts for cleaning, matching, and page generation
-/site                 generated static HTML output
+/data                 raw/cleaned survey exports (gitignored) + demo-*.json (committed, synthetic)
+/scripts              python scripts for cleaning, matching, table assignment, and page generation
+/site                 generated static HTML output — this is what gets deployed
 /site/uplevel/{slug}  one page per attendee
 /site/lookbook        filterable directory of all attendees
 /site/assets          shared CSS used across generated pages
+/site-demo            generated preview site from synthetic data — gitignored, never deployed
 ```
 
 ## Pipeline
 
-The pipeline has three stages:
+The pipeline has four stages:
 
 1. **Clean** ([scripts/clean.py](scripts/clean.py)) — loads the raw
    registrant CSV export, drops admin/waiver columns, normalizes role
    fields into lists and dietary answers into clean text (or `null`), and
    writes one JSON record per attendee keyed by a name-derived slug.
-2. **Match** ([scripts/match.py](scripts/match.py)) — placeholder;
-   matching/groupings logic isn't built yet.
-3. **Generate** ([scripts/generate_pages.py](scripts/generate_pages.py)) —
-   reads `attendees.json` and renders one HTML page per attendee under
-   `/site/uplevel/{slug}/`, plus a filterable directory page at
-   `/site/lookbook/`.
+2. **Match** ([scripts/match.py](scripts/match.py)) — compares each
+   attendee's `asks` against everyone else's `offers` using simple
+   keyword overlap and writes each attendee's top matches back onto their
+   record. Real attendees.json has no `asks`/`offers` yet (Part 2 data),
+   so running this against it today is a harmless no-op — every attendee
+   just gets an empty match list.
+3. **Assign tables** ([scripts/assign_tables.py](scripts/assign_tables.py))
+   — a simplified stand-in for the eventual Phase 4 logic: deals
+   attendees round-robin across N tables by primary role for a rough mix,
+   with no optimization on matches or industries yet.
+4. **Generate** ([scripts/generate_pages.py](scripts/generate_pages.py)) —
+   reads the (optionally match/table-enriched) attendees JSON and renders
+   one HTML page per attendee under `/site/uplevel/{slug}/`, plus a
+   filterable directory page at `/site/lookbook/`. If an attendee record
+   has `matches` and/or `table`, those render as real content; otherwise
+   the page falls back to the original "coming soon" placeholders.
 
-### Running end to end
+### Running end to end (real data, today)
+
+Real `attendees.json` has no `asks`/`offers`/table data yet, so the real
+pipeline for now is just clean → generate:
 
 ```bash
-python scripts/clean.py         --input data/form-response.csv --output data/attendees.json
-python scripts/match.py         # not implemented yet
+python scripts/clean.py          --input data/form-response.csv --output data/attendees.json
 python scripts/generate_pages.py --input data/attendees.json --output-dir site/
 ```
 
+Once Part 2 data (asks, offers, industries, sessions) is actually
+collected from real attendees, the full four-stage pipeline (clean →
+match → assign_tables → generate) becomes the real flow — see
+[Demo mode](#demo-mode-synthetic-data) below for what that looks like end
+to end, run today against synthetic data.
+
 Each script is a standalone CLI so any stage can be re-run independently
-once its input exists. `clean.py` and `generate_pages.py` also work with
-no flags — they default to the paths above.
+once its input exists, and each has sensible defaults matching the paths
+above so it also runs with no flags.
+
+## Demo mode (synthetic data)
+
+To preview the app before real Part 2 data arrives, [data/demo-attendees.json](data/demo-attendees.json)
+holds 15 clearly-fake attendees (`Demo Founder One`, `demo1@example.com`,
+etc.) with synthetic asks, offers, industries, and session picks —
+including a few deliberately overlapping ask/offer pairs so the matcher
+has something real to find.
+
+Run the full four-stage pipeline against it, writing to `/site-demo`
+instead of `/site`:
+
+```bash
+python scripts/match.py          --input data/demo-attendees.json --output data/demo-matches.json
+python scripts/assign_tables.py  --input data/demo-matches.json --output data/demo-tables.json --table-size 5
+python scripts/generate_pages.py --input data/demo-tables.json --output-dir site-demo/ --demo-banner
+```
+
+(There's no `clean` step for demo data — it's authored directly in the
+already-cleaned schema, so cleaning a raw CSV doesn't apply.)
+
+**`/site-demo` is for internal preview only — it is never deployed:**
+
+- It's `.gitignore`d entirely, so it's never committed, regardless of
+  what's in it.
+- The GitHub Actions Pages workflow only watches `site/**`
+  ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)), so
+  nothing under `/site-demo` can trigger a deploy even accidentally.
+- `--demo-banner` stamps a visible "⚠ DEMO DATA" banner on every
+  generated page as an extra guard against confusing it with the real
+  site.
+- The synthetic source data ([data/demo-attendees.json](data/demo-attendees.json))
+  *is* committed (it's fake, so there's no PII concern) so teammates can
+  regenerate the same preview after cloning the repo.
+
+**Previewing `/site-demo` locally**, without deploying anything:
+
+```bash
+cd site-demo && python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000/lookbook/` in a browser. Stop the
+server with Ctrl+C when done. `/site-demo` is fully self-contained (it
+gets its own copy of `assets/style.css`), so this works independently of
+whatever's in `/site`.
 
 ## Deploying
 

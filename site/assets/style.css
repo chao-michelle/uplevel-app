@@ -9,6 +9,11 @@
   --accent: #2f5d50;
   --accent-bg: #eaf1ef;
   --tag-bg: #f1f1f1;
+  --industry-bg: #eef2fb;
+  --industry-text: #33478a;
+  --demo-bg: #fff4e5;
+  --demo-text: #8a5a00;
+  --demo-border: #f0c98a;
 }
 
 * {
@@ -73,6 +78,56 @@ h2 {
   background: var(--accent-bg);
   color: var(--accent);
   font-weight: 600;
+}
+
+.tag--industry {
+  background: var(--industry-bg);
+  color: var(--industry-text);
+}
+
+.plain-list {
+  margin: 0.4rem 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.plain-list:last-child {
+  margin-bottom: 0;
+}
+
+.plain-list li {
+  margin-bottom: 0.3rem;
+}
+
+.demo-banner {
+  background: var(--demo-bg);
+  color: var(--demo-text);
+  border-bottom: 1px solid var(--demo-border);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+}
+
+.match-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.match-card:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.match-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.match-reason {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
 }
 
 .section {
