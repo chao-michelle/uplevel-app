@@ -1,8 +1,190 @@
-/* Shared styles for generated attendee pages. Placeholder — fill in once page design is set. */
+/* Shared styles for the UpLevel site: attendee pages and the lookbook. */
+
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --border: #e2e2e2;
+  --accent: #2f5d50;
+  --accent-bg: #eaf1ef;
+  --tag-bg: #f1f1f1;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 2rem 1.25rem;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 720px;
   margin: 0 auto;
-  max-width: 640px;
-  padding: 2rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.eyebrow {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem;
+}
+
+.tag-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.tag {
+  background: var(--tag-bg);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.tag--primary {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.section--placeholder p {
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Lookbook */
+
+.filter-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  position: sticky;
+  top: 1rem;
+  z-index: 1;
+}
+
+.filter-group {
+  margin-bottom: 0.75rem;
+}
+
+.filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-group-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--tag-bg);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-option input {
+  margin: 0;
+}
+
+.result-count {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.attendee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.attendee-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.attendee-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.attendee-card h3 a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.attendee-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.attendee-card .linkedin-link {
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.attendee-card[hidden] {
+  display: none;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }

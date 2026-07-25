@@ -7,35 +7,40 @@ matches with other attendees), published as a static site via GitHub Pages.
 ## Project structure
 
 ```
-/data          raw and cleaned survey exports (csv) — gitignored, not committed
-/scripts       python scripts for cleaning, matching, and page generation
-/site          generated static HTML output, one page per attendee
-/site/assets   shared CSS/images used across generated pages
+/data                 raw and cleaned survey exports — gitignored, not committed
+/scripts              python scripts for cleaning, matching, and page generation
+/site                 generated static HTML output
+/site/uplevel/{slug}  one page per attendee
+/site/lookbook        filterable directory of all attendees
+/site/assets          shared CSS used across generated pages
 ```
 
 ## Pipeline
 
-The pipeline has three stages, each a placeholder script for now:
+The pipeline has three stages:
 
-1. **Clean** ([scripts/clean.py](scripts/clean.py)) — normalize a raw survey
-   export into a clean CSV.
-2. **Match** ([scripts/match.py](scripts/match.py)) — compute attendee
-   matches/groupings from the cleaned data.
-3. **Generate** ([scripts/generate.py](scripts/generate.py)) — render one
-   HTML page per attendee into `/site`.
+1. **Clean** ([scripts/clean.py](scripts/clean.py)) — loads the raw
+   registrant CSV export, drops admin/waiver columns, normalizes role
+   fields into lists and dietary answers into clean text (or `null`), and
+   writes one JSON record per attendee keyed by a name-derived slug.
+2. **Match** ([scripts/match.py](scripts/match.py)) — placeholder;
+   matching/groupings logic isn't built yet.
+3. **Generate** ([scripts/generate_pages.py](scripts/generate_pages.py)) —
+   reads `attendees.json` and renders one HTML page per attendee under
+   `/site/uplevel/{slug}/`, plus a filterable directory page at
+   `/site/lookbook/`.
 
 ### Running end to end
 
 ```bash
-pip install -r requirements.txt
-
-python scripts/clean.py    --input data/raw_survey.csv --output data/clean_survey.csv
-python scripts/match.py    --input data/clean_survey.csv --output data/matches.csv
-python scripts/generate.py --input data/matches.csv --output-dir site/
+python scripts/clean.py         --input data/form-response.csv --output data/attendees.json
+python scripts/match.py         # not implemented yet
+python scripts/generate_pages.py --input data/attendees.json --output-dir site/
 ```
 
 Each script is a standalone CLI so any stage can be re-run independently
-once its input exists.
+once its input exists. `clean.py` and `generate_pages.py` also work with
+no flags — they default to the paths above.
 
 ## Deploying
 
@@ -62,21 +67,30 @@ rebuilds from it automatically on every push.
 
 ## Data privacy note
 
-This repo and its Pages site are **public** (private-repo Pages needs a
-paid GitHub plan, which this project isn't using). Attendee privacy relies
-on obscurity + de-indexing, not access control:
+This repo and its Pages site are **public** when deployed (private-repo
+Pages needs a paid GitHub plan, which this project isn't using). Attendee
+privacy relies on obscurity + de-indexing, not access control:
 
-- **Unguessable per-attendee slugs** — `scripts/generate.py` should generate
-  page filenames/URLs from a random token (e.g. `secrets.token_urlsafe`),
-  not from a name, email, or any sequential/predictable id.
+- **Per-attendee slugs are name-derived** (`jane-doe`, not a random token)
+  — see `slugify()` in [scripts/clean.py](scripts/clean.py). This was a
+  deliberate choice for readability, but it means URLs are **guessable**
+  for anyone who knows (or reasonably infers) an attendee's name — the
+  "unguessable slug" mitigation originally planned here does not actually
+  hold with the current scheme. If stronger protection is wanted later,
+  append a short random suffix to the slug (e.g. `jane-doe-x7k2`) —
+  cheap to add in `clean.py` without changing anything else.
 - **`site/robots.txt`** already disallows all crawling (`Disallow: /`) so
   well-behaved search engines won't index pages.
-- **`noindex` meta tag** — each generated page should still include
-  `<meta name="robots" content="noindex">` in its `<head>`, since
+- **`noindex` meta tag** — every generated page (attendee pages and the
+  lookbook) includes `<meta name="robots" content="noindex">`, since
   `robots.txt` only stops crawling, not indexing of a URL discovered
   elsewhere (e.g. linked from an email).
 - **`/data` is gitignored** so raw and cleaned survey exports (names,
-  emails, responses) are never committed to the public repo.
+  emails, phone numbers, etc.) are never committed to the public repo.
+- **The lookbook page (`/site/lookbook/`) lists every attendee on one
+  page** — it's the highest-value target if this repo/site is public, more
+  so than any single attendee page. Worth a deliberate decision before
+  going live, not just relying on `noindex`.
 
 None of this makes pages truly private — anyone with a page's URL can view
 it. And note that generated pages in `/site` **are** committed (Pages
