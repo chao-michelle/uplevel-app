@@ -195,6 +195,45 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
     return "".join(body)
 
 
+AVATAR_PALETTE = [
+    ("#2f5d50", "#ffffff"),
+    ("#33478a", "#ffffff"),
+    ("#8a5a00", "#ffffff"),
+    ("#7a3b69", "#ffffff"),
+    ("#3b6e8f", "#ffffff"),
+    ("#6b6b6b", "#ffffff"),
+]
+
+
+def initials(full_name: str) -> str:
+    parts = [p for p in full_name.strip().split() if p]
+    if not parts:
+        return "?"
+    if len(parts) == 1:
+        return parts[0][0].upper()
+    return (parts[0][0] + parts[-1][0]).upper()
+
+
+def avatar_html(attendee: dict, size: int = 48) -> str:
+    """Real photo if attendee has a photo_url (none do yet — no field
+    collects this today); otherwise a generated initials avatar, so cards
+    look finished either way with no external image requests."""
+    name = attendee["full_name"]
+    photo_url = attendee.get("photo_url")
+    if photo_url:
+        return f'<img class="avatar" src="{esc(photo_url)}" alt="{esc(name)}" width="{size}" height="{size}" loading="lazy">'
+
+    idx = sum(ord(c) for c in name) % len(AVATAR_PALETTE)
+    bg, fg = AVATAR_PALETTE[idx]
+    return (
+        f'<svg class="avatar" width="{size}" height="{size}" viewBox="0 0 48 48" role="img" aria-label="{esc(name)}">'
+        f'<rect width="48" height="48" rx="24" fill="{bg}"/>'
+        f'<text x="24" y="25" text-anchor="middle" dominant-baseline="central" '
+        f'font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="{fg}">{esc(initials(name))}</text>'
+        "</svg>"
+    )
+
+
 def render_attendee_card(attendee: dict) -> str:
     slug = attendee["slug"]
     name = esc(attendee["full_name"])
@@ -214,8 +253,13 @@ def render_attendee_card(attendee: dict) -> str:
     return f"""<article class="attendee-card"
   data-primary-role="{esc(primary_role)}"
   data-other-roles="{esc(ROLE_TAG_DELIMITER.join(other_roles))}">
-  <h3><a href="../uplevel/{slug}/">{name}</a></h3>
-  {role_tags_html(primary_role or None, other_roles, [primary_industry] if primary_industry else None)}
+  <div class="attendee-card-header">
+    {avatar_html(attendee)}
+    <div class="attendee-card-heading">
+      <h3><a href="../uplevel/{slug}/">{name}</a></h3>
+      {role_tags_html(primary_role or None, other_roles, [primary_industry] if primary_industry else None)}
+    </div>
+  </div>
   {linkedin_html}
 </article>"""
 

@@ -332,6 +332,24 @@ h2 {
   padding: 1rem;
 }
 
+.attendee-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.attendee-card-heading {
+  min-width: 0;
+}
+
 .attendee-card h3 {
   margin: 0 0 0.25rem;
   font-size: 1.05rem;
