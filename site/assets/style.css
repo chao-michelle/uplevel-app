@@ -30,7 +30,7 @@ body {
 }
 
 main {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -144,6 +144,95 @@ h2 {
   font-style: italic;
 }
 
+/* Attendee page layout: schedule is a collapsed top section on mobile
+   (source order puts it first), a right-rail panel from 768px up. One
+   breakpoint, one markup structure — see generate_pages.py. */
+
+.page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "schedule"
+    "main";
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.schedule-area {
+  grid-area: schedule;
+}
+
+.main-area {
+  grid-area: main;
+}
+
+.schedule-area > .section,
+.main-area > .section:first-child {
+  margin-top: 0;
+}
+
+.schedule-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.toggle-icon {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  transition: transform 0.15s ease;
+}
+
+.schedule-toggle[aria-expanded="true"] .toggle-icon {
+  transform: rotate(90deg);
+}
+
+.schedule-content {
+  display: none;
+  margin-top: 0.75rem;
+}
+
+.schedule-content.is-open {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .page-layout {
+    grid-template-columns: 1fr 300px;
+    grid-template-areas: "main schedule";
+    align-items: start;
+  }
+
+  .schedule-area {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .schedule-content {
+    display: block !important;
+    margin-top: 0.75rem;
+  }
+
+  .schedule-toggle {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .schedule-toggle .toggle-icon {
+    display: none;
+  }
+}
+
 /* Lookbook */
 
 .filter-bar {
@@ -155,6 +244,35 @@ h2 {
   position: sticky;
   top: 1rem;
   z-index: 1;
+}
+
+.filter-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.clear-filters {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.clear-filters:hover {
+  background: var(--accent-bg);
+}
+
+.clear-filters[hidden] {
+  display: none;
 }
 
 .filter-group {

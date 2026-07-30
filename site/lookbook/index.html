@@ -12,6 +12,10 @@
 <h1>Lookbook</h1>
 <p class="eyebrow">All UpLevel attendees</p>
 <div class="filter-bar">
+  <div class="filter-bar-header">
+    <span>Filters</span>
+    <button type="button" id="clear-filters" class="clear-filters" hidden>Clear filters</button>
+  </div>
   <div class="filter-group">
     <span class="filter-group-label">Primary role</span>
     <div class="filter-options">
@@ -729,6 +733,8 @@
 (function () {
   var cards = Array.prototype.slice.call(document.querySelectorAll(".attendee-card"));
   var countEl = document.getElementById("result-count");
+  var checkboxes = Array.prototype.slice.call(document.querySelectorAll('input[data-filter-group]'));
+  var clearBtn = document.getElementById("clear-filters");
 
   function selectedValues(group) {
     var boxes = document.querySelectorAll('input[data-filter-group="' + group + '"]:checked');
@@ -755,10 +761,16 @@
     });
 
     countEl.textContent = visible + " of " + cards.length + " attendees";
+    clearBtn.hidden = (primary.length === 0 && other.length === 0);
   }
 
-  document.querySelectorAll('input[data-filter-group]').forEach(function (box) {
+  checkboxes.forEach(function (box) {
     box.addEventListener("change", applyFilters);
+  });
+
+  clearBtn.addEventListener("click", function () {
+    checkboxes.forEach(function (box) { box.checked = false; });
+    applyFilters();
   });
 
   applyFilters();

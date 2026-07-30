@@ -114,28 +114,61 @@ def render_matches_section(attendee: dict) -> str:
 
 
 def render_schedule_section(attendee: dict) -> str:
+    """Renders the schedule as a single disclosure widget: collapsed by
+    default (mobile), forced open via CSS at the desktop/tablet breakpoint
+    where it becomes a right-rail panel instead. Same markup both ways —
+    see .schedule-content / .schedule-toggle in style.css."""
     table = attendee.get("table")
     sessions = attendee.get("sessions") or []
-    if table is None and not sessions:
-        return "".join([
-            '<section class="section section--placeholder">\n',
-            "  <h2>Your schedule</h2>\n",
-            "  <p>Coming closer to the event</p>\n",
-            "</section>\n",
-        ])
+    is_placeholder = table is None and not sessions
 
-    parts = ['<section class="section">\n', "  <h2>Your schedule</h2>\n"]
-    if table is not None:
-        parts.append(f"  <p>You're seated at <strong>Table {table}</strong></p>\n")
-    if sessions:
-        parts.append("  <ul class=\"plain-list\">")
-        parts.append("".join(f"<li>{esc(s)}</li>" for s in sessions))
-        parts.append("</ul>\n")
-    parts.append("</section>\n")
-    return "".join(parts)
+    if is_placeholder:
+        body = "  <p>Coming closer to the event</p>\n"
+    else:
+        parts = []
+        if table is not None:
+            parts.append(f"  <p>You're seated at <strong>Table {table}</strong></p>\n")
+        if sessions:
+            parts.append("  <ul class=\"plain-list\">")
+            parts.append("".join(f"<li>{esc(s)}</li>" for s in sessions))
+            parts.append("</ul>\n")
+        body = "".join(parts)
+
+    section_class = "section schedule-panel" + (" section--placeholder" if is_placeholder else "")
+
+    return "".join([
+        f'<section class="{section_class}">\n',
+        '  <h2><button type="button" class="schedule-toggle" aria-expanded="false" aria-controls="schedule-content">\n',
+        "    Your schedule\n",
+        '    <span class="toggle-icon" aria-hidden="true">▸</span>\n',
+        "  </button></h2>\n",
+        '  <div class="schedule-content" id="schedule-content">\n',
+        body,
+        "  </div>\n",
+        "</section>\n",
+    ])
+
+
+SCHEDULE_TOGGLE_SCRIPT = """<script>
+(function () {
+  document.querySelectorAll(".schedule-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      document.getElementById(btn.getAttribute("aria-controls")).classList.toggle("is-open", !expanded);
+    });
+  });
+})();
+</script>
+"""
 
 
 def render_attendee_page(attendee: dict, demo: bool) -> str:
+    """Layout: schedule comes first in source order (so it's the top
+    section on mobile with no JS reordering needed), then the main
+    column. .page-layout in style.css uses CSS grid-template-areas to
+    place schedule as a right rail next to (not above) main at the
+    tablet/desktop breakpoint — same markup both ways."""
     name = esc(attendee["full_name"])
     body = [
         PAGE_HEAD.format(
@@ -147,10 +180,16 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
         '<p class="eyebrow">UpLevel Attendee</p>\n',
         f"<h1>{name}</h1>\n",
         role_tags_html(attendee["primary_role"], attendee["other_roles"], attendee.get("industries")),
-        "\n",
+        '\n<div class="page-layout">\n',
+        '<aside class="schedule-area">\n',
+        render_schedule_section(attendee),
+        "</aside>\n",
+        '<div class="main-area">\n',
         render_asks_offers_section(attendee),
         render_matches_section(attendee),
-        render_schedule_section(attendee),
+        "</div>\n",
+        "</div>\n",
+        SCHEDULE_TOGGLE_SCRIPT,
         PAGE_TAIL,
     ]
     return "".join(body)
@@ -161,6 +200,9 @@ def render_attendee_card(attendee: dict) -> str:
     name = esc(attendee["full_name"])
     primary_role = attendee["primary_role"] or ""
     other_roles = attendee["other_roles"]
+    # Only the first industry shows on the card front — enough to scan at a
+    # glance without cluttering the card; the full list is on their page.
+    primary_industry = (attendee.get("industries") or [None])[0]
 
     linkedin_html = ""
     if attendee["linkedin"]:
@@ -173,7 +215,7 @@ def render_attendee_card(attendee: dict) -> str:
   data-primary-role="{esc(primary_role)}"
   data-other-roles="{esc(ROLE_TAG_DELIMITER.join(other_roles))}">
   <h3><a href="../uplevel/{slug}/">{name}</a></h3>
-  {role_tags_html(primary_role or None, other_roles)}
+  {role_tags_html(primary_role or None, other_roles, [primary_industry] if primary_industry else None)}
   {linkedin_html}
 </article>"""
 
@@ -203,6 +245,8 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
 (function () {
   var cards = Array.prototype.slice.call(document.querySelectorAll(".attendee-card"));
   var countEl = document.getElementById("result-count");
+  var checkboxes = Array.prototype.slice.call(document.querySelectorAll('input[data-filter-group]'));
+  var clearBtn = document.getElementById("clear-filters");
 
   function selectedValues(group) {
     var boxes = document.querySelectorAll('input[data-filter-group="' + group + '"]:checked');
@@ -229,10 +273,16 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
     });
 
     countEl.textContent = visible + " of " + cards.length + " attendees";
+    clearBtn.hidden = (primary.length === 0 && other.length === 0);
   }
 
-  document.querySelectorAll('input[data-filter-group]').forEach(function (box) {
+  checkboxes.forEach(function (box) {
     box.addEventListener("change", applyFilters);
+  });
+
+  clearBtn.addEventListener("click", function () {
+    checkboxes.forEach(function (box) { box.checked = false; });
+    applyFilters();
   });
 
   applyFilters();
@@ -245,6 +295,10 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         "<h1>Lookbook</h1>\n",
         '<p class="eyebrow">All UpLevel attendees</p>\n',
         '<div class="filter-bar">\n',
+        '  <div class="filter-bar-header">\n',
+        "    <span>Filters</span>\n",
+        '    <button type="button" id="clear-filters" class="clear-filters" hidden>Clear filters</button>\n',
+        "  </div>\n",
         '  <div class="filter-group">\n',
         '    <span class="filter-group-label">Primary role</span>\n',
         '    <div class="filter-options">\n',

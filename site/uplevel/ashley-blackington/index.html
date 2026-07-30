@@ -13,14 +13,36 @@
 <p class="eyebrow">UpLevel Attendee</p>
 <h1>Ashley Blackington</h1>
 <ul class="tag-list"><li class="tag tag--primary">Founder</li><li class="tag">Active Multi-Time Founder</li><li class="tag">Operator</li><li class="tag">Mentor / Advisor</li><li class="tag">Consultant (e.g., strategy, ops, marketing)</li><li class="tag">Author</li><li class="tag">Parent / Caregiver</li><li class="tag">Community Builder / Organizer</li></ul>
+<div class="page-layout">
+<aside class="schedule-area">
+<section class="section schedule-panel section--placeholder">
+  <h2><button type="button" class="schedule-toggle" aria-expanded="false" aria-controls="schedule-content">
+    Your schedule
+    <span class="toggle-icon" aria-hidden="true">▸</span>
+  </button></h2>
+  <div class="schedule-content" id="schedule-content">
+  <p>Coming closer to the event</p>
+  </div>
+</section>
+</aside>
+<div class="main-area">
 <section class="section section--placeholder">
   <h2>Your matches</h2>
   <p>Coming after Part 2 data</p>
 </section>
-<section class="section section--placeholder">
-  <h2>Your schedule</h2>
-  <p>Coming closer to the event</p>
-</section>
+</div>
+</div>
+<script>
+(function () {
+  document.querySelectorAll(".schedule-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      document.getElementById(btn.getAttribute("aria-controls")).classList.toggle("is-open", !expanded);
+    });
+  });
+})();
+</script>
 </main>
 </body>
 </html>
