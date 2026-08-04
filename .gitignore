@@ -16,5 +16,6 @@ data/*
 # and not deployed (only /site is wired into the Pages workflow).
 /site-demo/
 
-# Claude Code local settings
+# Claude Code local settings and installed skill packs — local tooling, not site content
 .claude/settings.local.json
+.claude/skills/

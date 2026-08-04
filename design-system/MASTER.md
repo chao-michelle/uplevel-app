@@ -102,6 +102,34 @@ the exact crop coordinates are only in the conversation history, not
 scripted, so a future regen means re-deriving the crop box by eye against
 the new asset.
 
+## Verified contrast ratios
+
+Computed (not eyeballed) against actual WCAG luminance formulas for every
+foreground/background pairing actually used in the CSS:
+
+| Pairing | Ratio | Result |
+|---|---|---|
+| `--text` on `--bg` | 14.94:1 | AAA |
+| `--text-muted` on `--bg` | 5.58:1 | AA |
+| `--accent` (h1/links) on white | 12.42:1 | AAA |
+| `--industry-text` on `--industry-bg` | 7.69:1 | AAA |
+| `--accent` on `--accent-bg` (primary tag) | 10.37:1 | AAA |
+| `--text` on `--surface` | 15.84:1 | AAA |
+| `--demo-text` on `--demo-bg` | 5.45:1 | AA |
+
+Every pairing clears WCAG AA (4.5:1); most clear AAA (7:1). If a future
+color addition doesn't hit at least AA against its intended background,
+don't ship it — adjust the shade rather than accepting a fail.
+
+## Typography pairing, independently cross-checked
+
+Playfair Display + a clean sans body font is a recognized pairing for
+"elegant, editorial" contexts (not just this project's own reasoning) —
+confirms the direction without dictating the specific sans-serif, which
+stays the existing system-font stack here rather than a second
+self-hosted font, to avoid adding another network-independence tradeoff
+beyond the one already made for the display face.
+
 ## Applying this system to new pages/features
 
 - Pull colors from the CSS custom properties above (`site/assets/style.css`
