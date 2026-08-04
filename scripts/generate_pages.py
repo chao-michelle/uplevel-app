@@ -324,8 +324,11 @@ def render_attendee_card(attendee: dict) -> str:
             "LinkedIn Profile",
             f'<a class="linkedin-link" href="{esc(attendee["linkedin"])}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>',
         ))
-    if attendee.get("email"):
-        fields.append(render_card_field("Email", f'<a href="mailto:{esc(attendee["email"])}">{esc(attendee["email"])}</a>'))
+    # Deliberately no email field — reversed after initially adding it (see
+    # git history): real attendee emails on a public, crawlable page listing
+    # all 85 people was too much exposure once the concrete "this goes live
+    # on a currently-public repo" consequence was made explicit, not just
+    # the general risk.
     if industries:
         fields.append(render_card_field("Interested Industry", '<ul class="tag-list">' + "".join(f'<li class="tag tag--industry">{esc(i)}</li>' for i in industries) + "</ul>"))
     if other_roles:
