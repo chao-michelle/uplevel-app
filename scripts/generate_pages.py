@@ -437,6 +437,12 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   });
 
   window.addEventListener("resize", syncFixedFilterPosition);
+  // Defensive backup for the aspect-ratio fix in style.css: if the hero
+  // banner's rendered height ever ends up different from what's reserved
+  // (a different image, a slow/partial load, etc.), this re-measures
+  // once everything (including images) has actually finished loading —
+  // "resize" alone never fires for that, only for viewport size changes.
+  window.addEventListener("load", syncFixedFilterPosition);
 
   applyFilters();
   syncFixedFilterPosition();

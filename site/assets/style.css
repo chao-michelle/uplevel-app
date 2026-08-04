@@ -148,6 +148,12 @@ h2 {
   display: block;
   width: 100%;
   height: auto;
+  /* Matches uplevel-rectangle.png's actual 1500x600 pixel size. Without
+     this, the browser doesn't know the image's rendered height until it
+     finishes downloading, so everything below it (including the fixed
+     filter bar's JS-measured position, see generate_pages.py) jumps once
+     it loads — a classic layout-shift bug, worse on slow connections. */
+  aspect-ratio: 2.5 / 1;
 }
 
 .match-card {
