@@ -12,9 +12,16 @@ matches with other attendees), published as a static site via GitHub Pages.
 /site                 generated static HTML output — this is what gets deployed
 /site/uplevel/{slug}  one page per attendee
 /site/lookbook        filterable directory of all attendees
-/site/assets          shared CSS used across generated pages
+/site/assets          shared CSS, fonts, and brand assets used across generated pages
 /site-demo            generated preview site from synthetic data — gitignored, never deployed
+/design-system        MASTER.md — colors, typography, and brand asset usage; the source
+                       of truth for any future styling work
 ```
+
+Styling changes should start from [design-system/MASTER.md](design-system/MASTER.md),
+not a fresh palette — it documents the exact brand colors/fonts and why
+they were chosen, sampled from the actual logo assets rather than
+generated generically.
 
 ## Pipeline
 

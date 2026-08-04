@@ -1,19 +1,41 @@
-/* Shared styles for the UpLevel site: attendee pages and the lookbook. */
+/* Shared styles for the UpLevel site: attendee pages and the lookbook.
+   Palette and type derived from Uplevel_Square.png / Uplevel_Rectangle.png —
+   see /design-system/MASTER.md for the source of truth and rationale. */
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("fonts/PlayfairDisplay-Italic-Variable.woff2") format("woff2");
+}
 
 :root {
-  --bg: #fafafa;
+  /* Brand-sourced */
+  --brand-navy: #102f76;
+  --brand-lavender: #c5cae9;
+
+  /* Core palette (navy/lavender-tinted neutrals, not generic gray) */
+  --bg: #f8f8fb;
   --surface: #ffffff;
-  --text: #1a1a1a;
-  --text-muted: #6b6b6b;
-  --border: #e2e2e2;
-  --accent: #2f5d50;
-  --accent-bg: #eaf1ef;
-  --tag-bg: #f1f1f1;
-  --industry-bg: #eef2fb;
-  --industry-text: #33478a;
+  --text: #1c2233;
+  --text-muted: #5c6478;
+  --border: #dfe2ea;
+
+  --accent: var(--brand-navy);
+  --accent-hover: #0c2359;
+  --accent-bg: #e8eaf6;
+
+  --tag-bg: #eef0f5;
+  --industry-bg: var(--brand-lavender);
+  --industry-text: var(--brand-navy);
+
   --demo-bg: #fff4e5;
   --demo-text: #8a5a00;
   --demo-border: #f0c98a;
+
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * {
@@ -21,29 +43,41 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 2rem 1.25rem;
+  padding: 0;
   line-height: 1.5;
 }
 
 main {
   max-width: 960px;
   margin: 0 auto;
+  padding: 2rem 1.25rem;
 }
 
 a {
   color: var(--accent);
 }
 
+a:hover {
+  color: var(--accent-hover);
+}
+
 h1 {
-  font-size: 1.75rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 2.25rem;
+  color: var(--accent);
   margin-bottom: 0.25rem;
 }
 
 h2 {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
@@ -106,6 +140,14 @@ h2 {
   font-weight: 600;
   font-size: 0.9rem;
   padding: 0.6rem 1rem;
+}
+
+/* Hero banner (Uplevel_Rectangle.png) — lookbook + landing page only, full
+   width outside main's content column. Never placed behind dense text. */
+.hero-banner {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .match-card {

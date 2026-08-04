@@ -33,10 +33,14 @@ PAGE_HEAD = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>{title}</title>
-  <link rel="stylesheet" href="{css_path}">
+  <link rel="stylesheet" href="{assets}style.css">
+  <link rel="icon" type="image/png" sizes="16x16" href="{assets}branding/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="{assets}branding/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="{assets}branding/favicon-48.png">
+  <link rel="apple-touch-icon" href="{assets}branding/apple-touch-icon.png">
 </head>
 <body>
-{banner}<main>
+{banner}{hero}<main>
 """
 
 PAGE_TAIL = """</main>
@@ -173,8 +177,9 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
     body = [
         PAGE_HEAD.format(
             title=f"{name} · UpLevel",
-            css_path="../../assets/style.css",
+            assets="../../assets/",
             banner=DEMO_BANNER if demo else "",
+            hero="",
         ),
         '<a class="back-link" href="../../lookbook/">← Back to lookbook</a>\n',
         '<p class="eyebrow">UpLevel Attendee</p>\n',
@@ -334,8 +339,19 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
 </script>
 """
 
+    hero = (
+        '<img class="hero-banner" src="../assets/branding/uplevel-rectangle.png" '
+        'alt="UpLevel — Women Investors &amp; Founders Moving the Needle Together, '
+        'Boston skyline">\n'
+    )
+
     return "".join([
-        PAGE_HEAD.format(title="UpLevel Lookbook", css_path="../assets/style.css", banner=DEMO_BANNER if demo else ""),
+        PAGE_HEAD.format(
+            title="UpLevel Lookbook",
+            assets="../assets/",
+            banner=DEMO_BANNER if demo else "",
+            hero=hero,
+        ),
         "<h1>Lookbook</h1>\n",
         '<p class="eyebrow">All UpLevel attendees</p>\n',
         '<div class="filter-bar">\n',
