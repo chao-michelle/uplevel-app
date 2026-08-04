@@ -359,7 +359,6 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   var clearBtn = document.getElementById("clear-filters");
   var filterBar = document.getElementById("filter-bar");
   var filterToggle = document.getElementById("filter-toggle");
-  var desktopQuery = window.matchMedia("(min-width: 768px)");
 
   function selectedValues(group) {
     var boxes = document.querySelectorAll('input[data-filter-group="' + group + '"]:checked');
@@ -371,26 +370,23 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
     filterToggle.setAttribute("aria-expanded", String(!collapsed));
   }
 
-  // The desktop filter bar is position:fixed at a static top (see
-  // style.css — deliberately NOT computed in JS: an earlier version tried
-  // to land it just below the hero banner by measuring .eyebrow's
-  // position, but mixed a document-relative coordinate
-  // (getBoundingClientRect().bottom + window.scrollY) into a "top" value
-  // that position:fixed interprets as viewport-relative. Depending on
-  // hero image height and viewport size that could compute a top past
-  // the actual viewport height, rendering the whole bar permanently
-  // off-screen — confirmed against a real deployed page, not assumed.
-  // The static CSS top trades "sits neatly below the hero" for "always
-  // actually visible," which matters more. This function now only
-  // handles the one thing that's still genuinely needed: since fixed
-  // positioning takes the bar out of document flow, content below it
-  // needs matching top spacing or it ends up hidden underneath.
+  // The filter bar is position:fixed at a static top (see style.css) at
+  // every breakpoint now, not just desktop — deliberately NOT computed in
+  // JS: an earlier version tried to land it just below the hero banner by
+  // measuring .eyebrow's position, but mixed a document-relative
+  // coordinate (getBoundingClientRect().bottom + window.scrollY) into a
+  // "top" value that position:fixed interprets as viewport-relative.
+  // Depending on hero image height and viewport size that could compute
+  // a top past the actual viewport height, rendering the whole bar
+  // permanently off-screen — confirmed against a real deployed page, not
+  // assumed. The static CSS top trades "sits neatly below the hero" for
+  // "always actually visible," which matters more. This function now
+  // only handles the one thing that's still genuinely needed: since
+  // fixed positioning takes the bar out of document flow at every
+  // breakpoint, content below it always needs matching top spacing or it
+  // ends up hidden underneath.
   function syncFixedFilterPosition() {
-    if (desktopQuery.matches) {
-      countEl.style.marginTop = (filterBar.getBoundingClientRect().height + 24) + "px";
-    } else {
-      countEl.style.marginTop = "";
-    }
+    countEl.style.marginTop = (filterBar.getBoundingClientRect().height + 24) + "px";
   }
 
   function applyFilters() {
