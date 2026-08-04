@@ -300,33 +300,45 @@ def avatar_html(attendee: dict, size: int = 48) -> str:
     )
 
 
+def render_card_field(label: str, content_html: str) -> str:
+    return (
+        '<div class="attendee-card-field">\n'
+        f'  <span class="field-label">{esc(label)}</span>\n'
+        f'  <div class="field-value">{content_html}</div>\n'
+        "</div>\n"
+    )
+
+
 def render_attendee_card(attendee: dict) -> str:
     slug = attendee["slug"]
     name = esc(attendee["full_name"])
     primary_role = attendee["primary_role"] or ""
     other_roles = attendee["other_roles"]
-    # Only the first industry shows on the card front — enough to scan at a
-    # glance without cluttering the card; the full list is on their page.
-    primary_industry = (attendee.get("industries") or [None])[0]
+    industries = attendee.get("industries") or []
 
-    linkedin_html = ""
-    if attendee["linkedin"]:
-        linkedin_html = (
-            f'<a class="linkedin-link" href="{esc(attendee["linkedin"])}" '
-            f'target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>'
-        )
+    fields = []
+    if primary_role:
+        fields.append(render_card_field("Primary Role", f'<ul class="tag-list"><li class="tag tag--primary">{esc(primary_role)}</li></ul>'))
+    if attendee.get("linkedin"):
+        fields.append(render_card_field(
+            "LinkedIn Profile",
+            f'<a class="linkedin-link" href="{esc(attendee["linkedin"])}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>',
+        ))
+    if attendee.get("email"):
+        fields.append(render_card_field("Email", f'<a href="mailto:{esc(attendee["email"])}">{esc(attendee["email"])}</a>'))
+    if industries:
+        fields.append(render_card_field("Interested Industry", '<ul class="tag-list">' + "".join(f'<li class="tag tag--industry">{esc(i)}</li>' for i in industries) + "</ul>"))
+    if other_roles:
+        fields.append(render_card_field("Other Roles", '<ul class="tag-list">' + "".join(f'<li class="tag">{esc(r)}</li>' for r in other_roles) + "</ul>"))
 
     return f"""<article class="attendee-card"
   data-primary-role="{esc(primary_role)}"
   data-other-roles="{esc(ROLE_TAG_DELIMITER.join(other_roles))}">
-  <div class="attendee-card-header">
-    {avatar_html(attendee)}
-    <div class="attendee-card-heading">
-      <h3><a href="../profile/{slug}/">{name}</a></h3>
-      {role_tags_html(primary_role or None, other_roles, [primary_industry] if primary_industry else None)}
-    </div>
+  <div class="attendee-card-avatar">
+    {avatar_html(attendee, size=88)}
   </div>
-  {linkedin_html}
+  <h3><a href="../profile/{slug}/">{name}</a></h3>
+  {"".join(fields)}
 </article>"""
 
 
@@ -424,7 +436,7 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
             banner=DEMO_BANNER if demo else "",
             hero=hero,
         ),
-        "<h1>Lookbook</h1>\n",
+        '<h1 class="lookbook-title">Lookbook</h1>\n',
         '<p class="eyebrow">All UpLevel attendees</p>\n',
         '<div class="filter-bar is-collapsed" id="filter-bar">\n',
         '<div class="filter-bar-inner">\n',
