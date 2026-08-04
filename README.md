@@ -20,11 +20,15 @@ matches with other attendees), published as a static site via GitHub Pages.
 ```
 
 **Public vs. private pages**: every attendee gets two separate pages, not
-one. `/profile/{slug}/` is public — name, roles, industries, LinkedIn —
-and is the only thing the lookbook (or anyone's match list) ever links
-to. `/uplevel/{private_slug}/` adds asks/offers, matches, and schedule,
-and is reachable only via the direct link sent to that specific person.
-The two use *different* slugs on purpose: `slug` is name-derived
+one. `/profile/{slug}/` is public — name, roles, industries, asks/offers,
+LinkedIn — and is the only thing the lookbook (or anyone's match list)
+ever links to. Asks/offers are public on purpose: self-disclosed info
+meant to help people find and connect with each other, a different kind
+of sensitive than matches/schedule. `/uplevel/{private_slug}/` adds
+matches and schedule — those reveal other people's plans (e.g. who else
+is at your table), and stay reachable only via the direct link sent to
+that specific person. The two pages use *different* slugs on purpose:
+`slug` is name-derived
 (`jane-doe`) and fine to be guessable since the profile page is meant to
 be public anyway; `private_slug` is a random token (`jane-doe-a8f3c9d2`)
 generated once in `clean.py` and kept stable across re-runs, specifically
@@ -165,12 +169,15 @@ important distinction now that pages are split into public/private:
 
 - **Public profile pages (`/profile/{slug}/`) are meant to be found** —
   that's the point, they're what the lookbook links to. Their slug is
-  name-derived and guessable on purpose; there's nothing sensitive on
-  them (name, roles, industries, LinkedIn — all already visible in the
-  lookbook itself).
-- **Private pages (`/uplevel/{private_slug}/`) hold the sensitive
-  content** — asks/offers, match recommendations, table/schedule — and
-  use a *separate*, randomly-generated slug (see `make_private_slug()` in
+  name-derived and guessable on purpose. They include name, roles,
+  industries, asks/offers, and LinkedIn — asks/offers are there
+  deliberately (self-disclosed, meant to help people connect), not an
+  oversight.
+- **Private pages (`/uplevel/{private_slug}/`) hold the content that's
+  sensitive because it's about *other* people, not just the page owner**
+  — match recommendations name other attendees, table/schedule reveals
+  who else is sitting where. Private pages use a *separate*,
+  randomly-generated slug (see `make_private_slug()` in
   [scripts/clean.py](scripts/clean.py)) that cannot be derived from the
   public slug or from an attendee's name. Nothing in the generated site
   links to a private page except the attendee's own "Back to lookbook"

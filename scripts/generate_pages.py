@@ -3,15 +3,18 @@
 and a private full page. Deliberately separate — see design-system/MASTER.md
 ("Public vs. private pages") for the reasoning.
 
-  /profile/{slug}/          public — name, roles, industries, LinkedIn.
-                             This is what lookbook cards link to.
-  /uplevel/{private_slug}/  private — adds asks/offers, matches, schedule.
-                             Never linked from the lookbook, a profile
-                             page, or another attendee's match list. Only
-                             reachable via the direct link sent to that
-                             person. private_slug is a random token, not
-                             derived from the name, so it can't be guessed
-                             from the public profile.
+  /profile/{slug}/          public — name, roles, industries, asks/offers,
+                             LinkedIn. This is what lookbook cards link to.
+  /uplevel/{private_slug}/  private — adds matches and schedule, which are
+                             a different kind of sensitive than asks/offers
+                             (they reveal other people's plans, e.g. who
+                             else is at your table). Never linked from the
+                             lookbook, a profile page, or another
+                             attendee's match list. Only reachable via the
+                             direct link sent to that person. private_slug
+                             is a random token, not derived from the name,
+                             so it can't be guessed from the public
+                             profile.
 
 If an attendee record includes "matches" (from match.py) and/or "table"
 (from assign_tables.py), the private page renders those as real content.
@@ -217,10 +220,13 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
 
 
 def render_public_profile_page(attendee: dict, demo: bool) -> str:
-    """The page a lookbook card links to. Deliberately limited: name, role
-    tags, industries, LinkedIn, optional fun fact — no asks/offers, no
-    matches, no schedule. Those live only on the private page at a
-    separate, unguessable URL (private_slug) that nothing here links to."""
+    """The page a lookbook card links to. Public: name, role tags,
+    industries, asks/offers, LinkedIn, optional fun fact — self-disclosed
+    info about the person, meant to help others find and connect with
+    them. Still excludes matches and schedule, which are a different kind
+    of sensitive (they reveal other people's plans, e.g. who else is at
+    your table) — those stay on the private page at a separate,
+    unguessable URL (private_slug) that nothing here links to."""
     name = esc(attendee["full_name"])
     body = [
         PAGE_HEAD.format(
@@ -234,6 +240,7 @@ def render_public_profile_page(attendee: dict, demo: bool) -> str:
         f"<h1>{name}</h1>\n",
         role_tags_html(attendee["primary_role"], attendee["other_roles"], attendee.get("industries")),
         "\n",
+        render_asks_offers_section(attendee),
     ]
 
     linkedin = attendee.get("linkedin")
