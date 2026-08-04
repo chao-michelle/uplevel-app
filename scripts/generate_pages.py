@@ -359,7 +359,6 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   var clearBtn = document.getElementById("clear-filters");
   var filterBar = document.getElementById("filter-bar");
   var filterToggle = document.getElementById("filter-toggle");
-  var eyebrow = document.querySelector("main > .eyebrow");
   var desktopQuery = window.matchMedia("(min-width: 768px)");
 
   function selectedValues(group) {
@@ -372,29 +371,24 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
     filterToggle.setAttribute("aria-expanded", String(!collapsed));
   }
 
-  // The desktop filter bar is position:fixed (see style.css) so it never
-  // moves on scroll, but that also takes it out of document flow — two
-  // things need fixing up in JS as a result:
-  //   1. Its "top" needs to land just below the hero banner/title, not at
-  //      the viewport's top edge (where a static CSS value would overlap
-  //      the hero). Measured from .eyebrow, the last normal-flow element
-  //      before it, rather than hard-coded, since hero banner height is
-  //      responsive.
-  //   2. Content below it needs matching top spacing so it doesn't end up
-  //      hidden underneath the now-out-of-flow filter bar.
+  // The desktop filter bar is position:fixed at a static top (see
+  // style.css — deliberately NOT computed in JS: an earlier version tried
+  // to land it just below the hero banner by measuring .eyebrow's
+  // position, but mixed a document-relative coordinate
+  // (getBoundingClientRect().bottom + window.scrollY) into a "top" value
+  // that position:fixed interprets as viewport-relative. Depending on
+  // hero image height and viewport size that could compute a top past
+  // the actual viewport height, rendering the whole bar permanently
+  // off-screen — confirmed against a real deployed page, not assumed.
+  // The static CSS top trades "sits neatly below the hero" for "always
+  // actually visible," which matters more. This function now only
+  // handles the one thing that's still genuinely needed: since fixed
+  // positioning takes the bar out of document flow, content below it
+  // needs matching top spacing or it ends up hidden underneath.
   function syncFixedFilterPosition() {
     if (desktopQuery.matches) {
-      if (eyebrow) {
-        // Document-absolute position (viewport position + current scroll),
-        // not just the viewport-relative rect — otherwise recomputing this
-        // on resize while already scrolled down would anchor the fixed bar
-        // to nonsense. This always resolves to "where it'd sit at scrollY 0".
-        var absoluteBottom = eyebrow.getBoundingClientRect().bottom + window.scrollY;
-        filterBar.style.top = (absoluteBottom + 16) + "px";
-      }
       countEl.style.marginTop = (filterBar.getBoundingClientRect().height + 24) + "px";
     } else {
-      filterBar.style.top = "";
       countEl.style.marginTop = "";
     }
   }
@@ -437,11 +431,9 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   });
 
   window.addEventListener("resize", syncFixedFilterPosition);
-  // Defensive backup for the aspect-ratio fix in style.css: if the hero
-  // banner's rendered height ever ends up different from what's reserved
-  // (a different image, a slow/partial load, etc.), this re-measures
-  // once everything (including images) has actually finished loading —
-  // "resize" alone never fires for that, only for viewport size changes.
+  // Re-measure once everything (fonts included) has actually finished
+  // loading, in case that shifts the filter bar's own height — "resize"
+  // alone never fires for that, only for viewport size changes.
   window.addEventListener("load", syncFixedFilterPosition);
 
   applyFilters();
