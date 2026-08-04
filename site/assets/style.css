@@ -301,28 +301,27 @@ h2 {
 
 /* Lookbook */
 
-/* True fixed positioning at every breakpoint, not sticky — the filter
-   bar never moves on scroll, not even the initial catch-up sticky does
-   before it reaches its scroll-anchored position. width/left/transform
-   reproduce main's centered max-width column since a fixed element can't
-   inherit it. Static top (not JS-computed) is deliberate — see
-   design-system/MASTER.md / git history if that reasoning matters later,
-   a computed version broke in ways that were hard to reproduce. */
+/* Normal document flow — deliberately not fixed or sticky. Several
+   rounds of position:fixed here (centered card, then full-width toolbar)
+   kept causing problems (off-screen rendering, content cut off behind
+   it) chasing a "never leave the screen" requirement that turned out not
+   to be the actual goal — scrolling back up to reach the filter bar is
+   fine. Plain flow removes the entire class of bug: no viewport-vs-
+   document coordinate math, no manual space reservation for content
+   below it, nothing to keep in sync on resize. */
 .filter-bar {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
-  position: fixed;
-  top: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(960px, calc(100% - 2.5rem));
-  max-height: calc(100vh - 3rem);
-  overflow-y: auto;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  z-index: 1;
+}
+
+.filter-bar-inner {
+  /* No longer needs to constrain width itself — .filter-bar is a normal
+     child of main now, already width-constrained by main's own
+     max-width. Kept as a plain wrapper so the HTML doesn't need to
+     change back and forth. */
 }
 
 .filter-bar-header {
@@ -357,18 +356,12 @@ h2 {
 /* Both breakpoints: filter body starts collapsed (server-rendered with
    .is-collapsed already on .filter-bar, so there's no expand-then-
    collapse flash) — the .filter-toggle button ("Filters") expands it, and
-   it stays however the user left it.
-
-   Desktop also collapses by default now, not just mobile — a deliberate
-   change from "always expanded" (see design-system/MASTER.md if that
-   history matters): once the filter bar became position:fixed instead of
-   sticky, an always-expanded ~350px panel would sit permanently on top of
-   whatever cards happen to scroll behind it — confirmed by measuring
-   actual card positions against the fixed bar's rect, not assumed: 6
-   cards sat fully behind it at an arbitrary scroll position during
-   testing. Collapsed, it's a thin header-only bar (comparable to a
-   normal fixed navbar) that barely overlaps anything; expanding it to
-   pick filters is a brief, user-initiated overlay, not a permanent one. */
+   it stays however the user left it. Collapsed by default at every width
+   so the full filter list (a tall panel once "Other roles" wraps across
+   several lines) doesn't push attendee cards below the fold on first
+   load — independent of the positioning method above; that part isn't
+   about fixed-vs-flow, just about not burying the results under an
+   expanded panel before the user has asked for one. */
 .filter-bar.is-collapsed .filter-body {
   display: none;
 }

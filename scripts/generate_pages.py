@@ -370,25 +370,6 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
     filterToggle.setAttribute("aria-expanded", String(!collapsed));
   }
 
-  // The filter bar is position:fixed at a static top (see style.css) at
-  // every breakpoint now, not just desktop — deliberately NOT computed in
-  // JS: an earlier version tried to land it just below the hero banner by
-  // measuring .eyebrow's position, but mixed a document-relative
-  // coordinate (getBoundingClientRect().bottom + window.scrollY) into a
-  // "top" value that position:fixed interprets as viewport-relative.
-  // Depending on hero image height and viewport size that could compute
-  // a top past the actual viewport height, rendering the whole bar
-  // permanently off-screen — confirmed against a real deployed page, not
-  // assumed. The static CSS top trades "sits neatly below the hero" for
-  // "always actually visible," which matters more. This function now
-  // only handles the one thing that's still genuinely needed: since
-  // fixed positioning takes the bar out of document flow at every
-  // breakpoint, content below it always needs matching top spacing or it
-  // ends up hidden underneath.
-  function syncFixedFilterPosition() {
-    countEl.style.marginTop = (filterBar.getBoundingClientRect().height + 24) + "px";
-  }
-
   function applyFilters() {
     var primary = selectedValues("primary-role");
     var other = selectedValues("other-role");
@@ -423,17 +404,9 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
 
   filterToggle.addEventListener("click", function () {
     setCollapsed(!filterBar.classList.contains("is-collapsed"));
-    syncFixedFilterPosition();
   });
 
-  window.addEventListener("resize", syncFixedFilterPosition);
-  // Re-measure once everything (fonts included) has actually finished
-  // loading, in case that shifts the filter bar's own height — "resize"
-  // alone never fires for that, only for viewport size changes.
-  window.addEventListener("load", syncFixedFilterPosition);
-
   applyFilters();
-  syncFixedFilterPosition();
 })();
 </script>
 """
@@ -454,6 +427,7 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         "<h1>Lookbook</h1>\n",
         '<p class="eyebrow">All UpLevel attendees</p>\n',
         '<div class="filter-bar is-collapsed" id="filter-bar">\n',
+        '<div class="filter-bar-inner">\n',
         '  <div class="filter-bar-header">\n',
         '    <button type="button" id="filter-toggle" class="filter-toggle" aria-expanded="false" aria-controls="filter-body">\n',
         "      Filters\n",
@@ -475,6 +449,7 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         "    </div>\n",
         "  </div>\n",
         "  </div>\n",
+        "</div>\n",
         "</div>\n",
         f'<p class="result-count" id="result-count">{len(attendees)} of {len(attendees)} attendees</p>\n',
         '<div class="attendee-grid">\n',
