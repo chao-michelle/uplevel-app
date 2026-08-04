@@ -296,10 +296,19 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   var countEl = document.getElementById("result-count");
   var checkboxes = Array.prototype.slice.call(document.querySelectorAll('input[data-filter-group]'));
   var clearBtn = document.getElementById("clear-filters");
+  var filterBar = document.getElementById("filter-bar");
+  var filterToggle = document.getElementById("filter-toggle");
+  var mobileQuery = window.matchMedia("(max-width: 767px)");
+  var hasAutoCollapsed = false;
 
   function selectedValues(group) {
     var boxes = document.querySelectorAll('input[data-filter-group="' + group + '"]:checked');
     return Array.prototype.map.call(boxes, function (b) { return b.value; });
+  }
+
+  function setCollapsed(collapsed) {
+    filterBar.classList.toggle("is-collapsed", collapsed);
+    filterToggle.setAttribute("aria-expanded", String(!collapsed));
   }
 
   function applyFilters() {
@@ -326,12 +335,25 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   }
 
   checkboxes.forEach(function (box) {
-    box.addEventListener("change", applyFilters);
+    box.addEventListener("change", function () {
+      applyFilters();
+      // Collapse on mobile after the first filter pick, to hand scroll
+      // space back to the results — not on every change, and not at all
+      // on tablet/desktop where the filter bar isn't in the way.
+      if (!hasAutoCollapsed && mobileQuery.matches) {
+        hasAutoCollapsed = true;
+        setCollapsed(true);
+      }
+    });
   });
 
   clearBtn.addEventListener("click", function () {
     checkboxes.forEach(function (box) { box.checked = false; });
     applyFilters();
+  });
+
+  filterToggle.addEventListener("click", function () {
+    setCollapsed(!filterBar.classList.contains("is-collapsed"));
   });
 
   applyFilters();
@@ -354,11 +376,15 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         ),
         "<h1>Lookbook</h1>\n",
         '<p class="eyebrow">All UpLevel attendees</p>\n',
-        '<div class="filter-bar">\n',
+        '<div class="filter-bar" id="filter-bar">\n',
         '  <div class="filter-bar-header">\n',
-        "    <span>Filters</span>\n",
+        '    <button type="button" id="filter-toggle" class="filter-toggle" aria-expanded="true" aria-controls="filter-body">\n',
+        "      Filters\n",
+        '      <span class="toggle-icon" aria-hidden="true">▸</span>\n',
+        "    </button>\n",
         '    <button type="button" id="clear-filters" class="clear-filters" hidden>Clear filters</button>\n',
         "  </div>\n",
+        '  <div class="filter-body" id="filter-body">\n',
         '  <div class="filter-group">\n',
         '    <span class="filter-group-label">Primary role</span>\n',
         '    <div class="filter-options">\n',
@@ -370,6 +396,7 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         '    <div class="filter-options">\n',
         other_filter_options + "\n",
         "    </div>\n",
+        "  </div>\n",
         "  </div>\n",
         "</div>\n",
         f'<p class="result-count" id="result-count">{len(attendees)} of {len(attendees)} attendees</p>\n',

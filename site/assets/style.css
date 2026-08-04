@@ -239,6 +239,24 @@ h2 {
   transform: rotate(90deg);
 }
 
+.filter-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.filter-toggle[aria-expanded="true"] .toggle-icon {
+  transform: rotate(90deg);
+}
+
 .schedule-content {
   display: none;
   margin-top: 0.75rem;
@@ -317,6 +335,29 @@ h2 {
   display: none;
 }
 
+/* Mobile: filter body starts expanded, JS collapses it after the first
+   filter interaction to give scroll space back to the results. The
+   .filter-toggle button ("Filters") re-expands it. Desktop/tablet ignores
+   the collapsed state entirely — filters always show. */
+.filter-bar.is-collapsed .filter-body {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .filter-body {
+    display: block !important;
+  }
+
+  .filter-toggle {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .filter-toggle .toggle-icon {
+    display: none;
+  }
+}
+
 .filter-group {
   margin-bottom: 0.75rem;
 }
@@ -373,6 +414,12 @@ h2 {
   border-radius: 14px;
   padding: 1.1rem;
   position: relative;
+  /* z-index: 0 (not "auto") is load-bearing: it makes the card establish
+     its own stacking context, so .linkedin-link's z-index below is scoped
+     to *within this card* and can never leak out to out-rank page-level
+     sticky elements like .filter-bar on DOM-order tiebreaks. Removing this
+     reintroduces the linkedin-pill-over-filter-bar overlap bug on scroll. */
+  z-index: 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
