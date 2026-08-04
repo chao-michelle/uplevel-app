@@ -10,6 +10,7 @@ import argparse
 import csv
 import json
 import re
+import secrets
 import sys
 import unicodedata
 
@@ -51,6 +52,41 @@ def make_unique_slug(base: str, used_slugs: set) -> str:
         n += 1
     used_slugs.add(slug)
     return slug
+
+
+def load_existing_private_slugs(output_path: str) -> dict:
+    """Private slugs must stay stable across pipeline re-runs — once a
+    person's private link is sent, re-running clean.py (e.g. for a data
+    correction) must not silently change it. Keyed by email since that's
+    the one stable identity field across re-exports of the raw CSV."""
+    try:
+        with open(output_path, encoding="utf-8") as f:
+            existing = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    return {
+        a["email"]: a["private_slug"]
+        for a in existing.values()
+        if a.get("email") and a.get("private_slug")
+    }
+
+
+def make_private_slug(public_slug: str, email: str, existing_by_email: dict, used: set) -> str:
+    """Unlike the public slug, this must not be derivable from the
+    person's name — it's the only thing standing between the public
+    profile page and the private page with their schedule/matches. Stable
+    across re-runs (see load_existing_private_slugs); brand new people get
+    a random suffix, not a guessable one."""
+    existing = existing_by_email.get(email)
+    if existing and existing not in used:
+        used.add(existing)
+        return existing
+
+    while True:
+        candidate = f"{public_slug}-{secrets.token_hex(4)}"
+        if candidate not in used:
+            used.add(candidate)
+            return candidate
 
 
 def clean_text(value: str) -> str | None:
@@ -121,9 +157,11 @@ def main() -> None:
     args = parser.parse_args()
 
     rows = load_rows(args.input)
+    existing_private_slugs = load_existing_private_slugs(args.output)
 
     attendees = {}
     used_slugs = set()
+    used_private_slugs = set()
     skipped = 0
 
     for row in rows:
@@ -133,6 +171,9 @@ def main() -> None:
             continue
         slug = make_unique_slug(slugify(cleaned["full_name"]), used_slugs)
         cleaned["slug"] = slug
+        cleaned["private_slug"] = make_private_slug(
+            slug, cleaned["email"], existing_private_slugs, used_private_slugs
+        )
         attendees[slug] = cleaned
 
     with open(args.output, "w", encoding="utf-8") as f:

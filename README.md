@@ -7,16 +7,29 @@ matches with other attendees), published as a static site via GitHub Pages.
 ## Project structure
 
 ```
-/data                 raw/cleaned survey exports (gitignored) + demo-*.json (committed, synthetic)
-/scripts              python scripts for cleaning, matching, table assignment, and page generation
-/site                 generated static HTML output — this is what gets deployed
-/site/uplevel/{slug}  one page per attendee
-/site/lookbook        filterable directory of all attendees
-/site/assets          shared CSS, fonts, and brand assets used across generated pages
-/site-demo            generated preview site from synthetic data — gitignored, never deployed
-/design-system        MASTER.md — colors, typography, and brand asset usage; the source
-                       of truth for any future styling work
+/data                         raw/cleaned survey exports (gitignored) + demo-*.json (committed, synthetic)
+/scripts                      python scripts for cleaning, matching, table assignment, and page generation
+/site                         generated static HTML output — this is what gets deployed
+/site/profile/{slug}          public profile per attendee — what lookbook cards link to
+/site/uplevel/{private_slug}  private full page (schedule, matches) — never linked, direct-send only
+/site/lookbook                filterable directory of all attendees, links to /profile only
+/site/assets                  shared CSS, fonts, and brand assets used across generated pages
+/site-demo                    generated preview site from synthetic data — gitignored, never deployed
+/design-system                MASTER.md — colors, typography, and brand asset usage; the source
+                               of truth for any future styling work
 ```
+
+**Public vs. private pages**: every attendee gets two separate pages, not
+one. `/profile/{slug}/` is public — name, roles, industries, LinkedIn —
+and is the only thing the lookbook (or anyone's match list) ever links
+to. `/uplevel/{private_slug}/` adds asks/offers, matches, and schedule,
+and is reachable only via the direct link sent to that specific person.
+The two use *different* slugs on purpose: `slug` is name-derived
+(`jane-doe`) and fine to be guessable since the profile page is meant to
+be public anyway; `private_slug` is a random token (`jane-doe-a8f3c9d2`)
+generated once in `clean.py` and kept stable across re-runs, specifically
+so that seeing someone's public profile never lets you derive their
+private URL.
 
 Styling changes should start from [design-system/MASTER.md](design-system/MASTER.md),
 not a fresh palette — it documents the exact brand colors/fonts and why
@@ -30,7 +43,10 @@ The pipeline has four stages:
 1. **Clean** ([scripts/clean.py](scripts/clean.py)) — loads the raw
    registrant CSV export, drops admin/waiver columns, normalizes role
    fields into lists and dietary answers into clean text (or `null`), and
-   writes one JSON record per attendee keyed by a name-derived slug.
+   writes one JSON record per attendee keyed by a name-derived slug. Also
+   generates each attendee's `private_slug` (a random token, not derived
+   from their name) — reused from the existing output on re-runs (matched
+   by email) so a person's private link never silently changes.
 2. **Match** ([scripts/match.py](scripts/match.py)) — compares each
    attendee's `asks` against everyone else's `offers` using simple
    keyword overlap and writes each attendee's top matches back onto their
@@ -43,10 +59,14 @@ The pipeline has four stages:
    with no optimization on matches or industries yet.
 4. **Generate** ([scripts/generate_pages.py](scripts/generate_pages.py)) —
    reads the (optionally match/table-enriched) attendees JSON and renders
-   one HTML page per attendee under `/site/uplevel/{slug}/`, plus a
-   filterable directory page at `/site/lookbook/`. If an attendee record
-   has `matches` and/or `table`, those render as real content; otherwise
-   the page falls back to the original "coming soon" placeholders.
+   *two* pages per attendee: a public profile at `/site/profile/{slug}/`
+   and a private full page at `/site/uplevel/{private_slug}/`, plus a
+   filterable lookbook at `/site/lookbook/` that links only to the public
+   profiles. If an attendee record has `matches` and/or `table`, the
+   private page renders those as real content; otherwise it falls back to
+   the original "coming soon" placeholders. Match cards on the private
+   page link to the matched person's *public* profile, never their
+   private page.
 
 ### Running end to end (real data, today)
 
@@ -140,32 +160,57 @@ rebuilds from it automatically on every push.
 
 This repo and its Pages site are **public** when deployed (private-repo
 Pages needs a paid GitHub plan, which this project isn't using). Attendee
-privacy relies on obscurity + de-indexing, not access control:
+privacy relies on obscurity + de-indexing, not access control — with one
+important distinction now that pages are split into public/private:
 
-- **Per-attendee slugs are name-derived** (`jane-doe`, not a random token)
-  — see `slugify()` in [scripts/clean.py](scripts/clean.py). This was a
-  deliberate choice for readability, but it means URLs are **guessable**
-  for anyone who knows (or reasonably infers) an attendee's name — the
-  "unguessable slug" mitigation originally planned here does not actually
-  hold with the current scheme. If stronger protection is wanted later,
-  append a short random suffix to the slug (e.g. `jane-doe-x7k2`) —
-  cheap to add in `clean.py` without changing anything else.
-- **`site/robots.txt`** already disallows all crawling (`Disallow: /`) so
-  well-behaved search engines won't index pages.
-- **`noindex` meta tag** — every generated page (attendee pages and the
-  lookbook) includes `<meta name="robots" content="noindex">`, since
-  `robots.txt` only stops crawling, not indexing of a URL discovered
-  elsewhere (e.g. linked from an email).
+- **Public profile pages (`/profile/{slug}/`) are meant to be found** —
+  that's the point, they're what the lookbook links to. Their slug is
+  name-derived and guessable on purpose; there's nothing sensitive on
+  them (name, roles, industries, LinkedIn — all already visible in the
+  lookbook itself).
+- **Private pages (`/uplevel/{private_slug}/`) hold the sensitive
+  content** — asks/offers, match recommendations, table/schedule — and
+  use a *separate*, randomly-generated slug (see `make_private_slug()` in
+  [scripts/clean.py](scripts/clean.py)) that cannot be derived from the
+  public slug or from an attendee's name. Nothing in the generated site
+  links to a private page except the attendee's own "Back to lookbook"
+  and match links, which point to *other* people's public profiles, never
+  their private pages. Verified by grepping every generated HTML file for
+  any `href` referencing `/uplevel/` — there are none outside a person's
+  own page.
+- **`site/robots.txt`** disallows all crawling (`Disallow: /`) so
+  well-behaved search engines won't index either page type.
+- **`noindex` meta tag** on every generated page, since `robots.txt` only
+  stops crawling, not indexing of a URL discovered elsewhere (e.g. linked
+  from an email).
 - **`/data` is gitignored** so raw and cleaned survey exports (names,
-  emails, phone numbers, etc.) are never committed to the public repo.
-- **The lookbook page (`/site/lookbook/`) lists every attendee on one
-  page** — it's the highest-value target if this repo/site is public, more
-  so than any single attendee page. Worth a deliberate decision before
-  going live, not just relying on `noindex`.
+  emails, phone numbers, private slugs, etc.) are never committed to the
+  public repo.
 
-None of this makes pages truly private — anyone with a page's URL can view
-it. And note that generated pages in `/site` **are** committed (Pages
-serves them from the repo), so attendee content that ends up on a page is
-in public git history too, including past versions after edits/deletes.
-Keep raw source data out of git entirely (`/data` is gitignored) and treat
-anything written into `/site` as public and permanent.
+None of this is real access control — anyone who obtains a private URL
+(e.g. it leaks from an email, or a link gets forwarded) can still view
+that page; there's no login. What this design actually prevents is the
+specific failure mode that prompted it: *other attendees browsing the
+public lookbook* reaching someone's schedule or match list. It does not
+protect against someone deliberately sharing or leaking their own private
+link.
+
+**Important caveat, not new but worth restating here**: this repo is
+public (required for free-tier Pages), and generated pages are committed
+to it — so every `private_slug` value is visible to anyone who browses
+`site/uplevel/` in the GitHub file tree, not just people using the
+deployed website. That's the same "public repo = public git history"
+tradeoff already true for every other name/role/LinkedIn value on this
+site; the private/public page split raises the bar from "click a lookbook
+card" to "think to check the source repo," but doesn't eliminate that
+route entirely. Closing it fully would mean either a paid plan for
+private-repo Pages, or generating pages at deploy time from data that
+never gets committed — both bigger changes than this one, and worth a
+deliberate decision rather than a silent one.
+
+Also note that generated pages in `/site` **are** committed (Pages serves
+them from the repo), so attendee content that ends up on a page — public
+or private — is in public git history too, including past versions after
+edits/deletes. Keep raw source data out of git entirely (`/data` is
+gitignored) and treat anything written into `/site` as public and
+permanent, private slug included.

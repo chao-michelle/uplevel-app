@@ -7,8 +7,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-one",
     "primary_role": "Founder",
     "founder_stage": "Finding Product Market Fit (>$1M Revenue)",
-    "other_roles": ["Active First-Time Founder"],
-    "industries": ["Climate Tech", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Active First-Time Founder"
+    ],
+    "industries": [
+      "Climate Tech",
+      "Deep Tech / Hardware"
+    ],
     "topic": "How to run a tight Series A process without losing momentum",
     "dietary_restrictions": null,
     "asks": [
@@ -19,7 +24,11 @@
       "Happy to share what worked (and didn't) in our seed round process",
       "Can offer intros within the climate tech founder community"
     ],
-    "sessions": ["Fundraising in a Down Market", "Scaling Climate Tech Ventures"]
+    "sessions": [
+      "Fundraising in a Down Market",
+      "Scaling Climate Tech Ventures"
+    ],
+    "private_slug": "demo-founder-one-7b3c5c6e"
   },
   "demo-founder-two": {
     "slug": "demo-founder-two",
@@ -29,8 +38,14 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-two",
     "primary_role": "Founder",
     "founder_stage": "Launched, Early Revenue",
-    "other_roles": ["Active Multi-Time Founder", "Engineer"],
-    "industries": ["Robotics", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Active Multi-Time Founder",
+      "Engineer"
+    ],
+    "industries": [
+      "Robotics",
+      "Deep Tech / Hardware"
+    ],
     "topic": "Hiring your first VP of Engineering",
     "dietary_restrictions": null,
     "asks": [
@@ -41,7 +56,11 @@
       "Can share our robotics supply chain vendor list",
       "Happy to talk through lessons from our first hardware prototype run"
     ],
-    "sessions": ["Building High-Performing Teams", "Deep Tech Commercialization 101"]
+    "sessions": [
+      "Building High-Performing Teams",
+      "Deep Tech Commercialization 101"
+    ],
+    "private_slug": "demo-founder-two-451d7243"
   },
   "demo-founder-three": {
     "slug": "demo-founder-three",
@@ -51,8 +70,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-three",
     "primary_role": "Founder",
     "founder_stage": "Concept/Idea",
-    "other_roles": ["Active First-Time Founder"],
-    "industries": ["Enterprise SaaS", "Fintech"],
+    "other_roles": [
+      "Active First-Time Founder"
+    ],
+    "industries": [
+      "Enterprise SaaS",
+      "Fintech"
+    ],
     "topic": "When and how to bring on a fractional exec team",
     "dietary_restrictions": "vegetarian",
     "asks": [
@@ -63,7 +87,10 @@
       "Can share our early customer discovery process",
       "Happy to swap notes on cap table tools"
     ],
-    "sessions": ["Fundraising in a Down Market"]
+    "sessions": [
+      "Fundraising in a Down Market"
+    ],
+    "private_slug": "demo-founder-three-c93b8f2f"
   },
   "demo-founder-four": {
     "slug": "demo-founder-four",
@@ -73,8 +100,12 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-four",
     "primary_role": "Founder",
     "founder_stage": "Growth (>$3M revenue)",
-    "other_roles": ["Active Multi-Time Founder"],
-    "industries": ["Enterprise SaaS"],
+    "other_roles": [
+      "Active Multi-Time Founder"
+    ],
+    "industries": [
+      "Enterprise SaaS"
+    ],
     "topic": "Selling into enterprise procurement as an early-stage startup",
     "dietary_restrictions": null,
     "asks": [
@@ -85,7 +116,10 @@
       "Happy to share our enterprise SaaS onboarding playbook",
       "Can offer intros within our procurement and IT buyer network"
     ],
-    "sessions": ["Storytelling for Founders"]
+    "sessions": [
+      "Storytelling for Founders"
+    ],
+    "private_slug": "demo-founder-four-fc7879b7"
   },
   "demo-founder-five": {
     "slug": "demo-founder-five",
@@ -95,8 +129,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-five",
     "primary_role": "Founder",
     "founder_stage": "Launched, Early Revenue",
-    "other_roles": ["Active First-Time Founder"],
-    "industries": ["Biotech", "Healthtech"],
+    "other_roles": [
+      "Active First-Time Founder"
+    ],
+    "industries": [
+      "Biotech",
+      "Healthtech"
+    ],
     "topic": "Navigating FDA regulatory strategy as a non-technical founder",
     "dietary_restrictions": null,
     "asks": [
@@ -107,7 +146,10 @@
       "Can share what we learned navigating our first FDA pre-submission meeting",
       "Happy to talk through lab-to-market timelines for diagnostics"
     ],
-    "sessions": ["Deep Tech Commercialization 101"]
+    "sessions": [
+      "Deep Tech Commercialization 101"
+    ],
+    "private_slug": "demo-founder-five-c87b1245"
   },
   "demo-founder-six": {
     "slug": "demo-founder-six",
@@ -117,8 +159,14 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-six",
     "primary_role": "Founder",
     "founder_stage": "Finding Product Market Fit (>$1M Revenue)",
-    "other_roles": ["Active First-Time Founder", "Parent / Caregiver"],
-    "industries": ["Agtech", "Consumer"],
+    "other_roles": [
+      "Active First-Time Founder",
+      "Parent / Caregiver"
+    ],
+    "industries": [
+      "Agtech",
+      "Consumer"
+    ],
     "topic": "Getting into retail and grocery as a food startup",
     "dietary_restrictions": null,
     "asks": [
@@ -129,7 +177,11 @@
       "Happy to share what worked for our early retail pilot and buyer intro process",
       "Can offer intros within the agtech founder community"
     ],
-    "sessions": ["Storytelling for Founders", "Scaling Climate Tech Ventures"]
+    "sessions": [
+      "Storytelling for Founders",
+      "Scaling Climate Tech Ventures"
+    ],
+    "private_slug": "demo-founder-six-5c4af81e"
   },
   "demo-founder-seven": {
     "slug": "demo-founder-seven",
@@ -139,8 +191,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-founder-seven",
     "primary_role": "Founder",
     "founder_stage": "Concept/Idea",
-    "other_roles": ["Active First-Time Founder"],
-    "industries": ["Space Tech", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Active First-Time Founder"
+    ],
+    "industries": [
+      "Space Tech",
+      "Deep Tech / Hardware"
+    ],
     "topic": "Government contracts and SBIR funding for hard tech",
     "dietary_restrictions": null,
     "asks": [
@@ -151,7 +208,11 @@
       "Can offer intros within the space tech founder community",
       "Happy to share our early SBIR application materials"
     ],
-    "sessions": ["Deep Tech Commercialization 101", "AI Applications in Hard Tech"]
+    "sessions": [
+      "Deep Tech Commercialization 101",
+      "AI Applications in Hard Tech"
+    ],
+    "private_slug": "demo-founder-seven-9f473788"
   },
   "demo-investor-one": {
     "slug": "demo-investor-one",
@@ -161,8 +222,14 @@
     "linkedin": "https://www.linkedin.com/in/demo-investor-one",
     "primary_role": "Investor",
     "founder_stage": null,
-    "other_roles": ["Active VC Investor", "Board Member"],
-    "industries": ["Climate Tech", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Active VC Investor",
+      "Board Member"
+    ],
+    "industries": [
+      "Climate Tech",
+      "Deep Tech / Hardware"
+    ],
     "topic": "How climate tech underwriting is changing in this market",
     "dietary_restrictions": null,
     "asks": [
@@ -173,7 +240,11 @@
       "Happy to make intros to co-investors and LPs writing checks into climate tech and deep tech at Series A",
       "Can offer feedback on climate tech pitch decks before a raise"
     ],
-    "sessions": ["Scaling Climate Tech Ventures", "Angel Investing 201: Climate & Deep Tech"]
+    "sessions": [
+      "Scaling Climate Tech Ventures",
+      "Angel Investing 201: Climate & Deep Tech"
+    ],
+    "private_slug": "demo-investor-one-428514fa"
   },
   "demo-investor-two": {
     "slug": "demo-investor-two",
@@ -183,8 +254,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-investor-two",
     "primary_role": "Investor",
     "founder_stage": null,
-    "other_roles": ["Active VC Investor"],
-    "industries": ["Climate Tech", "AI/ML"],
+    "other_roles": [
+      "Active VC Investor"
+    ],
+    "industries": [
+      "Climate Tech",
+      "AI/ML"
+    ],
     "topic": "Emerging LP appetite for climate and deep tech funds",
     "dietary_restrictions": "gluten free",
     "asks": [
@@ -195,7 +271,10 @@
       "Happy to make warm intros to portfolio company hiring networks",
       "Open to sharing our climate tech underwriting framework"
     ],
-    "sessions": ["Angel Investing 201: Climate & Deep Tech"]
+    "sessions": [
+      "Angel Investing 201: Climate & Deep Tech"
+    ],
+    "private_slug": "demo-investor-two-e6b08d15"
   },
   "demo-investor-three": {
     "slug": "demo-investor-three",
@@ -205,8 +284,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-investor-three",
     "primary_role": "Investor",
     "founder_stage": null,
-    "other_roles": ["Active LP Investor"],
-    "industries": ["Climate Tech", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Active LP Investor"
+    ],
+    "industries": [
+      "Climate Tech",
+      "Deep Tech / Hardware"
+    ],
     "topic": "Diligence red flags in early-stage deep tech",
     "dietary_restrictions": null,
     "asks": [
@@ -217,7 +301,11 @@
       "Open to LP opportunities in climate tech and deep tech focused funds",
       "Happy to share our LP due diligence checklist"
     ],
-    "sessions": ["Angel Investing 201: Climate & Deep Tech", "Fundraising in a Down Market"]
+    "sessions": [
+      "Angel Investing 201: Climate & Deep Tech",
+      "Fundraising in a Down Market"
+    ],
+    "private_slug": "demo-investor-three-938e6b70"
   },
   "demo-advisor-one": {
     "slug": "demo-advisor-one",
@@ -227,8 +315,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-advisor-one",
     "primary_role": "Advisor/Mentor",
     "founder_stage": null,
-    "other_roles": ["Mentor / Advisor", "Board Member"],
-    "industries": ["Enterprise SaaS"],
+    "other_roles": [
+      "Mentor / Advisor",
+      "Board Member"
+    ],
+    "industries": [
+      "Enterprise SaaS"
+    ],
     "topic": "What actually moves the needle in enterprise sales cycles",
     "dietary_restrictions": null,
     "asks": [
@@ -239,7 +332,11 @@
       "Can offer intros to enterprise sales leaders and help navigate Fortune 500 procurement",
       "Happy to mentor first-time founders on enterprise go-to-market"
     ],
-    "sessions": ["Storytelling for Founders", "Board Governance for First-Time Founders"]
+    "sessions": [
+      "Storytelling for Founders",
+      "Board Governance for First-Time Founders"
+    ],
+    "private_slug": "demo-advisor-one-be4f803e"
   },
   "demo-advisor-two": {
     "slug": "demo-advisor-two",
@@ -249,8 +346,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-advisor-two",
     "primary_role": "Advisor/Mentor",
     "founder_stage": null,
-    "other_roles": ["Mentor / Advisor"],
-    "industries": ["Biotech", "Healthtech"],
+    "other_roles": [
+      "Mentor / Advisor"
+    ],
+    "industries": [
+      "Biotech",
+      "Healthtech"
+    ],
     "topic": "Regulatory strategy for medtech founders",
     "dietary_restrictions": null,
     "asks": [
@@ -261,7 +363,10 @@
       "Available to advise on FDA regulatory pathways for diagnostics and medical devices",
       "Happy to review clinical trial design for early-stage biotech founders"
     ],
-    "sessions": ["Deep Tech Commercialization 101"]
+    "sessions": [
+      "Deep Tech Commercialization 101"
+    ],
+    "private_slug": "demo-advisor-two-70135cb9"
   },
   "demo-operator-one": {
     "slug": "demo-operator-one",
@@ -271,8 +376,14 @@
     "linkedin": "https://www.linkedin.com/in/demo-operator-one",
     "primary_role": "Operator / Executive",
     "founder_stage": null,
-    "other_roles": ["Operator", "Consultant (e.g., strategy, ops, marketing)"],
-    "industries": ["Robotics", "Deep Tech / Hardware"],
+    "other_roles": [
+      "Operator",
+      "Consultant (e.g., strategy, ops, marketing)"
+    ],
+    "industries": [
+      "Robotics",
+      "Deep Tech / Hardware"
+    ],
     "topic": "Building a hiring engine for hard-to-fill technical roles",
     "dietary_restrictions": null,
     "asks": [
@@ -283,7 +394,10 @@
       "Can help with sourcing and hiring senior engineers, especially hardware and robotics roles",
       "Happy to share our technical interview loop template"
     ],
-    "sessions": ["Building High-Performing Teams"]
+    "sessions": [
+      "Building High-Performing Teams"
+    ],
+    "private_slug": "demo-operator-one-36e2a036"
   },
   "demo-operator-two": {
     "slug": "demo-operator-two",
@@ -293,8 +407,12 @@
     "linkedin": "https://www.linkedin.com/in/demo-operator-two",
     "primary_role": "Operator / Executive",
     "founder_stage": null,
-    "other_roles": ["Operator"],
-    "industries": ["Enterprise SaaS"],
+    "other_roles": [
+      "Operator"
+    ],
+    "industries": [
+      "Enterprise SaaS"
+    ],
     "topic": "People ops playbooks for growth-stage startups",
     "dietary_restrictions": null,
     "asks": [
@@ -305,7 +423,11 @@
       "Happy to share our performance review and comp banding frameworks",
       "Can offer intros within our people ops peer network"
     ],
-    "sessions": ["Building High-Performing Teams", "Board Governance for First-Time Founders"]
+    "sessions": [
+      "Building High-Performing Teams",
+      "Board Governance for First-Time Founders"
+    ],
+    "private_slug": "demo-operator-two-bdca4c27"
   },
   "demo-service-provider-one": {
     "slug": "demo-service-provider-one",
@@ -315,8 +437,13 @@
     "linkedin": "https://www.linkedin.com/in/demo-service-provider-one",
     "primary_role": "Service Provider",
     "founder_stage": null,
-    "other_roles": ["Consultant (e.g., strategy, ops, marketing)"],
-    "industries": ["Fintech", "Enterprise SaaS"],
+    "other_roles": [
+      "Consultant (e.g., strategy, ops, marketing)"
+    ],
+    "industries": [
+      "Fintech",
+      "Enterprise SaaS"
+    ],
     "topic": "What founders get wrong about financial modeling",
     "dietary_restrictions": null,
     "asks": [
@@ -327,6 +454,9 @@
       "Offer fractional CFO services and financial modeling support for early-stage startups",
       "Happy to do a free financial model review for early-stage founders"
     ],
-    "sessions": ["Fundraising in a Down Market"]
+    "sessions": [
+      "Fundraising in a Down Market"
+    ],
+    "private_slug": "demo-service-provider-one-403202e7"
   }
 }

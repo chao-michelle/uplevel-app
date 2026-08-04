@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
-"""Generate one static HTML page per attendee, plus a filterable lookbook page.
+"""Generate the lookbook plus two pages per attendee: a public profile
+and a private full page. Deliberately separate — see design-system/MASTER.md
+("Public vs. private pages") for the reasoning.
+
+  /profile/{slug}/          public — name, roles, industries, LinkedIn.
+                             This is what lookbook cards link to.
+  /uplevel/{private_slug}/  private — adds asks/offers, matches, schedule.
+                             Never linked from the lookbook, a profile
+                             page, or another attendee's match list. Only
+                             reachable via the direct link sent to that
+                             person. private_slug is a random token, not
+                             derived from the name, so it can't be guessed
+                             from the public profile.
 
 If an attendee record includes "matches" (from match.py) and/or "table"
-(from assign_tables.py), those render as real content. Otherwise the page
-falls back to the original "coming soon" placeholders, so this script
-works unchanged for real attendees.json (no Part 2 data yet) and for an
-enriched demo dataset alike.
+(from assign_tables.py), the private page renders those as real content.
+Otherwise it falls back to the original "coming soon" placeholders, so
+this script works unchanged for real attendees.json (no Part 2 data yet)
+and for an enriched demo dataset alike.
 
 Usage:
     python scripts/generate_pages.py --input data/attendees.json --output-dir site/
@@ -98,9 +110,13 @@ def render_matches_section(attendee: dict) -> str:
 
     cards = []
     for m in matches:
+        # Links to their PUBLIC profile, not their private page — a match
+        # having your contact info doesn't mean they should see your
+        # schedule and matches, or you theirs. Only a person's own direct
+        # link (private_slug) reaches their private page.
         cards.append("".join([
             '<article class="match-card">\n',
-            f'  <h3><a href="../{esc(m["slug"])}/">{esc(m["full_name"])}</a></h3>\n',
+            f'  <h3><a href="../../profile/{esc(m["slug"])}/">{esc(m["full_name"])}</a></h3>\n',
             f'  <p class="match-reason">Their offer: &ldquo;{esc(m["their_offer"])}&rdquo;'
             f' matches your ask: &ldquo;{esc(m["your_ask"])}&rdquo;</p>\n',
             '  <ul class="tag-list">',
@@ -200,6 +216,44 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
     return "".join(body)
 
 
+def render_public_profile_page(attendee: dict, demo: bool) -> str:
+    """The page a lookbook card links to. Deliberately limited: name, role
+    tags, industries, LinkedIn, optional fun fact — no asks/offers, no
+    matches, no schedule. Those live only on the private page at a
+    separate, unguessable URL (private_slug) that nothing here links to."""
+    name = esc(attendee["full_name"])
+    body = [
+        PAGE_HEAD.format(
+            title=f"{name} · UpLevel",
+            assets="../../assets/",
+            banner=DEMO_BANNER if demo else "",
+            hero="",
+        ),
+        '<a class="back-link" href="../../lookbook/">← Back to lookbook</a>\n',
+        '<p class="eyebrow">UpLevel Attendee</p>\n',
+        f"<h1>{name}</h1>\n",
+        role_tags_html(attendee["primary_role"], attendee["other_roles"], attendee.get("industries")),
+        "\n",
+    ]
+
+    linkedin = attendee.get("linkedin")
+    if linkedin:
+        body.append(
+            f'<p><a class="linkedin-link" href="{esc(linkedin)}" '
+            f'target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></p>\n'
+        )
+
+    fun_fact = attendee.get("fun_fact")
+    if fun_fact:
+        body.append('<section class="section">\n')
+        body.append("  <h2>Fun fact</h2>\n")
+        body.append(f"  <p>{esc(fun_fact)}</p>\n")
+        body.append("</section>\n")
+
+    body.append(PAGE_TAIL)
+    return "".join(body)
+
+
 AVATAR_PALETTE = [
     ("#2f5d50", "#ffffff"),
     ("#33478a", "#ffffff"),
@@ -261,7 +315,7 @@ def render_attendee_card(attendee: dict) -> str:
   <div class="attendee-card-header">
     {avatar_html(attendee)}
     <div class="attendee-card-heading">
-      <h3><a href="../uplevel/{slug}/">{name}</a></h3>
+      <h3><a href="../profile/{slug}/">{name}</a></h3>
       {role_tags_html(primary_role or None, other_roles, [primary_industry] if primary_industry else None)}
     </div>
   </div>
@@ -421,14 +475,24 @@ def main() -> None:
 
     attendees = sorted(attendees_by_slug.values(), key=lambda a: a["full_name"])
 
+    missing_private_slug = [a["full_name"] for a in attendees if not a.get("private_slug")]
+    if missing_private_slug:
+        raise ValueError(
+            "These attendees have no private_slug (re-run clean.py to generate one): "
+            f"{missing_private_slug}"
+        )
+
     site_root = Path(args.output_dir)
-    uplevel_dir = site_root / "uplevel"
+    uplevel_dir = site_root / "uplevel"       # private: schedule + matches, unlinked
+    profile_dir = site_root / "profile"       # public: what lookbook cards link to
     lookbook_dir = site_root / "lookbook"
     assets_dir = site_root / "assets"
 
     shutil.rmtree(uplevel_dir, ignore_errors=True)
+    shutil.rmtree(profile_dir, ignore_errors=True)
     shutil.rmtree(lookbook_dir, ignore_errors=True)
     uplevel_dir.mkdir(parents=True, exist_ok=True)
+    profile_dir.mkdir(parents=True, exist_ok=True)
     lookbook_dir.mkdir(parents=True, exist_ok=True)
 
     assets_source = Path(args.assets_source)
@@ -436,13 +500,18 @@ def main() -> None:
         shutil.copytree(assets_source, assets_dir, dirs_exist_ok=True)
 
     for attendee in attendees:
-        page_dir = uplevel_dir / attendee["slug"]
-        page_dir.mkdir(parents=True, exist_ok=True)
-        (page_dir / "index.html").write_text(render_attendee_page(attendee, args.demo_banner), encoding="utf-8")
+        private_page_dir = uplevel_dir / attendee["private_slug"]
+        private_page_dir.mkdir(parents=True, exist_ok=True)
+        (private_page_dir / "index.html").write_text(render_attendee_page(attendee, args.demo_banner), encoding="utf-8")
+
+        public_page_dir = profile_dir / attendee["slug"]
+        public_page_dir.mkdir(parents=True, exist_ok=True)
+        (public_page_dir / "index.html").write_text(render_public_profile_page(attendee, args.demo_banner), encoding="utf-8")
 
     (lookbook_dir / "index.html").write_text(render_lookbook_page(attendees, args.demo_banner), encoding="utf-8")
 
-    print(f"Generated {len(attendees)} attendee page(s) under {uplevel_dir}/")
+    print(f"Generated {len(attendees)} private page(s) under {uplevel_dir}/ (unlinked — send each link directly)")
+    print(f"Generated {len(attendees)} public profile page(s) under {profile_dir}/")
     print(f"Generated lookbook at {lookbook_dir}/index.html")
 
 

@@ -474,9 +474,10 @@ h2 {
   text-decoration: underline;
 }
 
-.attendee-card .linkedin-link {
-  position: relative;
-  z-index: 1;
+/* Base pill styling — usable standalone (public profile page) or inside a
+   card. .attendee-card scopes an additional position/z-index override
+   below, needed only for the stacking-context trick within cards. */
+.linkedin-link {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -491,9 +492,14 @@ h2 {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.attendee-card .linkedin-link:hover {
+.linkedin-link:hover {
   background: var(--accent);
   color: #ffffff;
+}
+
+.attendee-card .linkedin-link {
+  position: relative;
+  z-index: 1;
 }
 
 .attendee-card[hidden] {
