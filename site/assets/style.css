@@ -335,26 +335,39 @@ h2 {
   display: none;
 }
 
-/* Mobile: filter body starts expanded, JS collapses it after the first
-   filter interaction to give scroll space back to the results. The
-   .filter-toggle button ("Filters") re-expands it. Desktop/tablet ignores
-   the collapsed state entirely — filters always show. */
+/* Both breakpoints: filter body starts collapsed (server-rendered with
+   .is-collapsed already on .filter-bar, so there's no expand-then-
+   collapse flash) — the .filter-toggle button ("Filters") expands it, and
+   it stays however the user left it.
+
+   Desktop also collapses by default now, not just mobile — a deliberate
+   change from "always expanded" (see design-system/MASTER.md if that
+   history matters): once the filter bar became position:fixed instead of
+   sticky, an always-expanded ~350px panel would sit permanently on top of
+   whatever cards happen to scroll behind it — confirmed by measuring
+   actual card positions against the fixed bar's rect, not assumed: 6
+   cards sat fully behind it at an arbitrary scroll position during
+   testing. Collapsed, it's a thin header-only bar (comparable to a
+   normal fixed navbar) that barely overlaps anything; expanding it to
+   pick filters is a brief, user-initiated overlay, not a permanent one. */
 .filter-bar.is-collapsed .filter-body {
   display: none;
 }
 
 @media (min-width: 768px) {
-  .filter-body {
-    display: block !important;
-  }
-
-  .filter-toggle {
-    cursor: default;
-    pointer-events: none;
-  }
-
-  .filter-toggle .toggle-icon {
-    display: none;
+  /* True fixed positioning (not sticky) — the filter bar never moves on
+     scroll, not even the initial catch-up sticky does before it reaches
+     its scroll-anchored position. width/left/transform reproduce main's
+     centered max-width column since a fixed element can't inherit it. */
+  .filter-bar {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(960px, calc(100% - 2.5rem));
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 }
 

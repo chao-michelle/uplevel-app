@@ -352,8 +352,8 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   var clearBtn = document.getElementById("clear-filters");
   var filterBar = document.getElementById("filter-bar");
   var filterToggle = document.getElementById("filter-toggle");
-  var mobileQuery = window.matchMedia("(max-width: 767px)");
-  var hasAutoCollapsed = false;
+  var eyebrow = document.querySelector("main > .eyebrow");
+  var desktopQuery = window.matchMedia("(min-width: 768px)");
 
   function selectedValues(group) {
     var boxes = document.querySelectorAll('input[data-filter-group="' + group + '"]:checked');
@@ -363,6 +363,33 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   function setCollapsed(collapsed) {
     filterBar.classList.toggle("is-collapsed", collapsed);
     filterToggle.setAttribute("aria-expanded", String(!collapsed));
+  }
+
+  // The desktop filter bar is position:fixed (see style.css) so it never
+  // moves on scroll, but that also takes it out of document flow — two
+  // things need fixing up in JS as a result:
+  //   1. Its "top" needs to land just below the hero banner/title, not at
+  //      the viewport's top edge (where a static CSS value would overlap
+  //      the hero). Measured from .eyebrow, the last normal-flow element
+  //      before it, rather than hard-coded, since hero banner height is
+  //      responsive.
+  //   2. Content below it needs matching top spacing so it doesn't end up
+  //      hidden underneath the now-out-of-flow filter bar.
+  function syncFixedFilterPosition() {
+    if (desktopQuery.matches) {
+      if (eyebrow) {
+        // Document-absolute position (viewport position + current scroll),
+        // not just the viewport-relative rect — otherwise recomputing this
+        // on resize while already scrolled down would anchor the fixed bar
+        // to nonsense. This always resolves to "where it'd sit at scrollY 0".
+        var absoluteBottom = eyebrow.getBoundingClientRect().bottom + window.scrollY;
+        filterBar.style.top = (absoluteBottom + 16) + "px";
+      }
+      countEl.style.marginTop = (filterBar.getBoundingClientRect().height + 24) + "px";
+    } else {
+      filterBar.style.top = "";
+      countEl.style.marginTop = "";
+    }
   }
 
   function applyFilters() {
@@ -389,16 +416,7 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
   }
 
   checkboxes.forEach(function (box) {
-    box.addEventListener("change", function () {
-      applyFilters();
-      // Collapse on mobile after the first filter pick, to hand scroll
-      // space back to the results — not on every change, and not at all
-      // on tablet/desktop where the filter bar isn't in the way.
-      if (!hasAutoCollapsed && mobileQuery.matches) {
-        hasAutoCollapsed = true;
-        setCollapsed(true);
-      }
-    });
+    box.addEventListener("change", applyFilters);
   });
 
   clearBtn.addEventListener("click", function () {
@@ -408,9 +426,13 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
 
   filterToggle.addEventListener("click", function () {
     setCollapsed(!filterBar.classList.contains("is-collapsed"));
+    syncFixedFilterPosition();
   });
 
+  window.addEventListener("resize", syncFixedFilterPosition);
+
   applyFilters();
+  syncFixedFilterPosition();
 })();
 </script>
 """
@@ -430,9 +452,9 @@ def render_lookbook_page(attendees: list, demo: bool) -> str:
         ),
         "<h1>Lookbook</h1>\n",
         '<p class="eyebrow">All UpLevel attendees</p>\n',
-        '<div class="filter-bar" id="filter-bar">\n',
+        '<div class="filter-bar is-collapsed" id="filter-bar">\n',
         '  <div class="filter-bar-header">\n',
-        '    <button type="button" id="filter-toggle" class="filter-toggle" aria-expanded="true" aria-controls="filter-body">\n',
+        '    <button type="button" id="filter-toggle" class="filter-toggle" aria-expanded="false" aria-controls="filter-body">\n',
         "      Filters\n",
         '      <span class="toggle-icon" aria-hidden="true">▸</span>\n',
         "    </button>\n",
