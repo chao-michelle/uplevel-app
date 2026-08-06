@@ -191,7 +191,13 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
     section on mobile with no JS reordering needed), then the main
     column. .page-layout in style.css uses CSS grid-template-areas to
     place schedule as a right rail next to (not above) main at the
-    tablet/desktop breakpoint — same markup both ways."""
+    tablet/desktop breakpoint — same markup both ways.
+
+    Deliberately no asks/offers here — that now lives on the public
+    profile page instead (see render_public_profile_page), so this
+    private page stays focused on the two things that are exclusively
+    private: schedule and matches. Repeating asks/offers here would just
+    be redundant with the public page."""
     name = esc(attendee["full_name"])
     body = [
         PAGE_HEAD.format(
@@ -209,7 +215,6 @@ def render_attendee_page(attendee: dict, demo: bool) -> str:
         render_schedule_section(attendee),
         "</aside>\n",
         '<div class="main-area">\n',
-        render_asks_offers_section(attendee),
         render_matches_section(attendee),
         "</div>\n",
         "</div>\n",
